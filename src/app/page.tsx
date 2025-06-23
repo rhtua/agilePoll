@@ -36,10 +36,11 @@ export default function Home() {
         <Flex
           w={{ base: '80vw', md: '50vw' }}
           direction='column'
-          maxH='60vh'
+          maxH='70vh'
           align='center'
           bgColor='white'
-          gap={5}
+          overflowY='auto'
+          gap={3}
           borderRadius='lg'
           shadow='xl'
           px={5}

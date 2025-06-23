@@ -38,8 +38,8 @@ export default function Cards({ cards }: CardsProps) {
           position={'relative'}
           p={2}
           cursor='pointer'
-          w='120px'
-          h='160px'
+          w={{ base: '100px', xl: '120px' }}
+          h={{ base: '150px', xl: '160px' }}
           bgColor='#FBFBFB'
           borderTopRadius='lg'
           align='center'

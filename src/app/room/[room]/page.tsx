@@ -31,13 +31,19 @@ export default function RoomPage() {
     <Flex
       w='full'
       h='full'
-      justify='center'
+      justify='space-between'
       align='center'
       bgColor='#F1F1F1'
       direction='column'
     >
       {/* Table */}
-      <Flex minW={'20vw'} minH={'30vh'} direction='column' gap={8} mt={20}>
+      <Flex
+        minW={'20vw'}
+        minH={{ base: '20vh', '2xl': '30vh' }}
+        direction='column'
+        gap={8}
+        mt={{ base: 10, xl: 16, '2xl': 20 }}
+      >
         <HStack w={'full'} justify={justifyRobots(firstHalf)} gap={10}>
           {firstHalf?.map((robot) => (
             <Robot key={robot} avatar={robot} name={robot} />
@@ -61,7 +67,6 @@ export default function RoomPage() {
           ))}
         </HStack>
       </Flex>
-      <Spacer />
       <Cards cards={['0.5', '1', '1.5', '2', '2.5', '3']} />
     </Flex>
   )

@@ -11,8 +11,8 @@ export default function Robot({ avatar, name }: RobotProps) {
     <Flex
       bgImage={`url(${avatar})`}
       bgSize={'100% 100%'}
-      w={'56px'}
-      h='86px'
+      w={{ base: '40px', xl: '56px' }}
+      h={{ base: '70px', xl: '86px' }}
       position='relative'
       align='end'
       justify='center'
