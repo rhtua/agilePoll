@@ -1,11 +1,8 @@
 import type { Metadata } from 'next'
 import { Urbanist } from 'next/font/google'
+import PageLayout from '~/components/PageLayout'
 import { Provider } from '~/components/ui/provider'
 import './global.css'
-import { Button, Flex, HStack, Spacer } from '@chakra-ui/react'
-import Image from 'next/image'
-import { AiOutlineUserAdd } from 'react-icons/ai'
-import PageLayout from '~/components/PageLayout'
 
 const urbanist = Urbanist({
   subsets: ['latin'],

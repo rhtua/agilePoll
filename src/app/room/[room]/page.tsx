@@ -1,11 +1,15 @@
 'use client'
-import { Flex, HStack, Spacer } from '@chakra-ui/react'
+import { Flex, HStack } from '@chakra-ui/react'
 import { useParams } from 'next/navigation'
 import Cards from '~/components/Cards'
 import Robot from '~/components/Robots'
+import { useFirebase } from '~/hooks/useFirebase'
 
 export default function RoomPage() {
   const { room } = useParams()
+  const { room: dbRoom } = useFirebase()
+
+  console.log('Room:', dbRoom)
 
   const robots =
     room

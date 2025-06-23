@@ -1,13 +1,5 @@
-import {
-  Button,
-  Field,
-  Flex,
-  HStack,
-  Input,
-  Separator,
-  Stack,
-  Text,
-} from '@chakra-ui/react'
+import { Flex, Stack, Text } from '@chakra-ui/react'
+import { RoomForm } from '~/components/RoomForm'
 
 export default function Home() {
   return (
@@ -33,66 +25,7 @@ export default function Home() {
         >
           Crie ou entre em uma sala, convide participantes e comece a votar
         </Text>
-        <Flex
-          w={{ base: '80vw', md: '50vw' }}
-          direction='column'
-          maxH='70vh'
-          align='center'
-          bgColor='white'
-          overflowY='auto'
-          gap={3}
-          borderRadius='lg'
-          shadow='xl'
-          px={5}
-          py={8}
-        >
-          <Field.Root required>
-            <Field.Label>Nome da sala</Field.Label>
-            <Input placeholder='Escolha o nome da sala' />
-          </Field.Root>
-
-          <Field.Root required>
-            <Field.Label>Pontuação</Field.Label>
-            <Input placeholder='0,1,1.5,2,2.5,3,4,5' />
-          </Field.Root>
-
-          <Button
-            colorPalette='orange'
-            px={10}
-            size='md'
-            style={{
-              backgroundColor: '#DD6B20',
-              fontWeight: 600,
-              fontSize: 16,
-              color: 'white',
-            }}
-          >
-            Criar sala
-          </Button>
-          <HStack w={'40%'}>
-            <Separator colorPalette='orange' flex='1' />
-            <Text flexShrink='0'>ou</Text>
-            <Separator flex='1' />
-          </HStack>
-          <Field.Root required>
-            <Field.Label>Código da sala</Field.Label>
-            <Input placeholder='AAAA-BBBB' />
-          </Field.Root>
-          <Button
-            px={7}
-            colorPalette='orange'
-            variant='outline'
-            size='md'
-            style={{
-              borderColor: '#DD6B20',
-              fontWeight: 600,
-              fontSize: 16,
-              color: '#DD6B20',
-            }}
-          >
-            Entrar na sala
-          </Button>
-        </Flex>
+        <RoomForm />
       </Stack>
     </Flex>
   )

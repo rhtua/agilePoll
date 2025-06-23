@@ -7,5 +7,10 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports.biome": "explicit",
     "source.fixAll.biome": "explicit"
+  },
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#372060",
+    "titleBar.activeBackground": "#4D2D86",
+    "titleBar.activeForeground": "#FCFBFE"
   }
 }
