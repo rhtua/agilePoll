@@ -1,95 +1,98 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import {
+  Button,
+  Field,
+  Flex,
+  HStack,
+  Input,
+  Separator,
+  Stack,
+  Text,
+} from '@chakra-ui/react'
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <Flex
+      p={3}
+      justify='center'
+      w='full'
+      h='full'
+      bgImage="url('/homeBg.png')"
+      bgSize='100% 100%'
+      bgRepeat='no-repeat'
+    >
+      <Stack align='center' mt={5}>
+        <Text fontSize='4xl' fontWeight='bold' textAlign='start' w='full'>
+          Planning Poker
+        </Text>
+        <Text
+          fontSize='lg  '
+          fontWeight='400'
+          textAlign='start'
+          w='full'
+          mb={3}
+        >
+          Crie ou entre em uma sala, convide participantes e comece a votar
+        </Text>
+        <Flex
+          w={{ base: '80vw', md: '50vw' }}
+          direction='column'
+          maxH='60vh'
+          align='center'
+          bgColor='white'
+          gap={5}
+          borderRadius='lg'
+          shadow='xl'
+          px={5}
+          py={8}
+        >
+          <Field.Root required>
+            <Field.Label>Nome da sala</Field.Label>
+            <Input placeholder='Escolha o nome da sala' />
+          </Field.Root>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Field.Root required>
+            <Field.Label>Pontuação</Field.Label>
+            <Input placeholder='0,1,1.5,2,2.5,3,4,5' />
+          </Field.Root>
+
+          <Button
+            colorPalette='orange'
+            px={10}
+            size='md'
+            style={{
+              backgroundColor: '#DD6B20',
+              fontWeight: 600,
+              fontSize: 16,
+              color: 'white',
+            }}
           >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
+            Criar sala
+          </Button>
+          <HStack w={'40%'}>
+            <Separator colorPalette='orange' flex='1' />
+            <Text flexShrink='0'>ou</Text>
+            <Separator flex='1' />
+          </HStack>
+          <Field.Root required>
+            <Field.Label>Código da sala</Field.Label>
+            <Input placeholder='AAAA-BBBB' />
+          </Field.Root>
+          <Button
+            px={7}
+            colorPalette='orange'
+            variant='outline'
+            size='md'
+            style={{
+              borderColor: '#DD6B20',
+              fontWeight: 600,
+              fontSize: 16,
+              color: '#DD6B20',
+            }}
           >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+            Entrar na sala
+          </Button>
+        </Flex>
+      </Stack>
+    </Flex>
+  )
 }
