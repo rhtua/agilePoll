@@ -1,8 +1,10 @@
 'use client'
 import { createIcon, Flex, Text } from '@chakra-ui/react'
+import { useFirebase } from '~/hooks/useFirebase'
 
 interface CardsProps {
   cards: string[]
+  canVote: boolean
 }
 
 const CardsIcon = createIcon({
@@ -28,45 +30,81 @@ const CardsIcon = createIcon({
   ),
 })
 
-export default function Cards({ cards }: CardsProps) {
+export default function Cards({ cards, canVote }: CardsProps) {
+  const { vote, user, room } = useFirebase()
+
+  const myVote = room?.users.find((u) => u.uid === user?.uid)?.vote
+
+  function handleCardClick(card: string) {
+    if (!canVote) return
+    try {
+      vote(card)
+    } catch (error) {
+      console.error('Error voting:', error)
+    }
+  }
+
   return (
     <Flex align='end'>
       {cards.map((card, index) => (
         <Flex
+          onClick={() => handleCardClick(card)}
           zIndex={10 + index}
           key={card}
           position={'relative'}
           p={2}
           cursor='pointer'
           w={{ base: '100px', xl: '120px' }}
-          h={{ base: '150px', xl: '160px' }}
+          h={myVote === card ? '180px' : { base: '150px', xl: '160px' }}
           bgColor='#FBFBFB'
           borderTopRadius='lg'
           align='center'
           justify='space-between'
-          borderColor='#575757'
+          borderColor={myVote === card ? '#F7C379' : '#575757'}
           borderWidth={3}
-          borderBottomWidth={0}
+          borderBottomWidth={myVote === card ? 3 : 0}
+          borderBottomLeftRadius={myVote === card ? 'lg' : 0}
+          borderBottomRightRadius={myVote === card ? 'lg' : 0}
           ml={index > 0 ? '-20px' : 0}
           direction='column'
-          color='#575757'
+          color={myVote === card ? '#F7C379' : '#575757'}
           transition='all 0.3s ease-in-out'
-          _hover={{
-            color: '#F7C379',
-            borderColor: '#F7C379',
-            h: '180px',
-            borderBottomWidth: 3,
-            borderBottomRadius: 'lg',
-            '& > :nth-child(2)': {
-              transform: 'translateY(-15px)',
-            },
-            '& > :nth-child(3)': {
-              transform: 'translateY(-15px)',
-            },
-            '& > :nth-child(4)': {
-              transform: 'translateY(-15px)',
-            },
-          }}
+          _hover={
+            canVote
+              ? {
+                  color: '#F7C379',
+                  borderColor: '#F7C379',
+                  h: '180px',
+                  borderBottomWidth: 3,
+                  borderBottomLeftRadius: 'lg',
+                  borderBottomRightRadius: 'lg',
+                  '& > :nth-child(2)': {
+                    transform: 'translateY(-15px)',
+                  },
+                  '& > :nth-child(3)': {
+                    transform: 'translateY(-15px)',
+                  },
+                  '& > :nth-child(4)': {
+                    transform: 'translateY(-15px)',
+                  },
+                }
+              : {}
+          }
+          css={
+            myVote === card
+              ? {
+                  '& > :nth-child(2)': {
+                    transform: 'translateY(-15px)',
+                  },
+                  '& > :nth-child(3)': {
+                    transform: 'translateY(-15px)',
+                  },
+                  '& > :nth-child(4)': {
+                    transform: 'translateY(-15px)',
+                  },
+                }
+              : {}
+          }
         >
           <Text fontSize={14} fontWeight={700} w='full'>
             {card}

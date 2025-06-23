@@ -4,9 +4,11 @@ import { Flex, Text } from '@chakra-ui/react'
 interface RobotProps {
   avatar: string
   name: string
+  vote?: string
+  revealVotes: boolean
 }
 
-export default function Robot({ avatar, name }: RobotProps) {
+export default function Robot({ avatar, name, vote, revealVotes }: RobotProps) {
   return (
     <Flex
       bgImage={`url(${avatar})`}
@@ -14,10 +16,22 @@ export default function Robot({ avatar, name }: RobotProps) {
       w={{ base: '40px', xl: '56px' }}
       h={{ base: '70px', xl: '86px' }}
       position='relative'
-      align='end'
-      justify='center'
       borderRadius='lg'
     >
+      {vote && vote !== '' && revealVotes && (
+        <Flex
+          align='center'
+          justify='center'
+          w='full'
+          h='full'
+          bgColor={'rgba(57, 57, 57, 0.9)'}
+          borderRadius='lg'
+        >
+          <Text fontWeight={700} fontSize='3xl' color='white' zIndex={3}>
+            {vote}
+          </Text>
+        </Flex>
+      )}
       <Flex
         w='fit-content'
         maxW='70px'

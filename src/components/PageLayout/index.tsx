@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { AiOutlineUserAdd } from 'react-icons/ai'
 import { LiaUserAstronautSolid } from 'react-icons/lia'
 import { MdKeyboardArrowDown } from 'react-icons/md'
+import { useFirebase } from '~/hooks/useFirebase'
 
 export default function PageLayout({
   children,
@@ -12,6 +13,7 @@ export default function PageLayout({
   children: React.ReactNode
 }>) {
   const { room } = useParams()
+  const { user, room: roomData } = useFirebase()
 
   return (
     <Flex
@@ -55,7 +57,9 @@ export default function PageLayout({
                 color: 'white',
               }}
             >
-              <LiaUserAstronautSolid /> User
+              <LiaUserAstronautSolid />{' '}
+              {roomData?.users.find((u) => u.uid === user?.uid)?.name ||
+                'Usuário'}
               <MdKeyboardArrowDown />
             </Button>
           </HStack>

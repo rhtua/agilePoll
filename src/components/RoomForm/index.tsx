@@ -10,14 +10,24 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/navigation'
-import type { FormEvent } from 'react'
+import { type FormEvent, useEffect, useState } from 'react'
 import { withMask } from 'use-mask-input'
 import { useFirebase } from '~/hooks/useFirebase'
 export function RoomForm() {
-  const { createRoom } = useFirebase()
+  const { createRoom, signInUser, joinRoom, user } = useFirebase()
   const router = useRouter()
+  const [loading, setLoading] = useState<'join' | 'create' | undefined>(
+    undefined,
+  )
 
-  function handleCreateRoom(ev: FormEvent<HTMLFormElement>) {
+  useEffect(() => {
+    if (!user) {
+      signInUser()
+    }
+  }, [user, signInUser])
+
+  async function handleCreateRoom(ev: FormEvent<HTMLFormElement>) {
+    ev.preventDefault()
     const formData = new FormData(ev.currentTarget)
     const name = formData.get('roomName') as string
     const userName = formData.get('userName') as string
@@ -28,15 +38,33 @@ export function RoomForm() {
     }
 
     try {
-      createRoom(name, userName, points)
+      setLoading('create')
+      const roomCode = await createRoom(name, userName, points)
+      router.push(`/room/${roomCode}`)
     } catch (e) {
       console.error('Error creating room:', e)
+      setLoading(undefined)
     }
   }
 
-  function handleJoinRoom(ev: FormEvent<HTMLFormElement>) {
+  async function handleJoinRoom(ev: FormEvent<HTMLFormElement>) {
     ev.preventDefault()
     const formData = new FormData(ev.currentTarget)
+    const code = formData.get('code') as string
+    const userName = formData.get('userName') as string
+
+    if (!userName || !code) {
+      return
+    }
+
+    try {
+      setLoading('join')
+      await joinRoom(code, userName)
+      router.push(`/room/${code}`)
+    } catch (e) {
+      console.error('Error joining room:', e)
+      setLoading(undefined)
+    }
 
     router.push(`/room/${formData.get('code')}`)
   }
@@ -62,15 +90,17 @@ export function RoomForm() {
         gap={3}
         onSubmit={handleCreateRoom}
       >
-        <Field.Root required>
-          <Field.Label>Nome da sala</Field.Label>
-          <Input name='roomName' placeholder='Escolha o nome da sala' />
-        </Field.Root>
+        <HStack w='full'>
+          <Field.Root required>
+            <Field.Label>Nome da sala</Field.Label>
+            <Input name='roomName' placeholder='Escolha o nome da sala' />
+          </Field.Root>
 
-        <Field.Root required>
-          <Field.Label>Seu nome</Field.Label>
-          <Input name='userName' placeholder='Digite o seu nome' />
-        </Field.Root>
+          <Field.Root required>
+            <Field.Label>Seu nome</Field.Label>
+            <Input name='userName' placeholder='Digite o seu nome' />
+          </Field.Root>
+        </HStack>
 
         <Field.Root required>
           <Field.Label>Pontuação</Field.Label>
@@ -93,6 +123,8 @@ export function RoomForm() {
             fontSize: 16,
             color: 'white',
           }}
+          loading={loading === 'create'}
+          disabled={loading === 'join'}
           type='submit'
         >
           Criar sala
@@ -110,14 +142,20 @@ export function RoomForm() {
         gap={3}
         onSubmit={handleJoinRoom}
       >
-        <Field.Root required>
-          <Field.Label>Código da sala</Field.Label>
-          <Input
-            name='code'
-            ref={withMask('AAAA-AAAA')}
-            placeholder='AAAA-BBBB'
-          />
-        </Field.Root>
+        <HStack w='full'>
+          <Field.Root required>
+            <Field.Label>Seu nome</Field.Label>
+            <Input name='userName' placeholder='Digite o seu nome' />
+          </Field.Root>
+          <Field.Root required>
+            <Field.Label>Código da sala</Field.Label>
+            <Input
+              name='code'
+              ref={withMask('AAAA-AAAA')}
+              placeholder='AAAA-BBBB'
+            />
+          </Field.Root>
+        </HStack>
         <Button
           w='fit'
           mx='auto'
@@ -131,6 +169,8 @@ export function RoomForm() {
             fontSize: 16,
             color: '#DD6B20',
           }}
+          loading={loading === 'join'}
+          disabled={loading === 'create'}
           type='submit'
         >
           Entrar na sala

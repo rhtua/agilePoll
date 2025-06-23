@@ -2,8 +2,8 @@
 import type { Analytics } from 'firebase/analytics'
 import { getAnalytics } from 'firebase/analytics'
 import { initializeApp } from 'firebase/app'
-import { getAuth, type User } from 'firebase/auth'
-import { getDatabase, onValue, ref, set } from 'firebase/database'
+import { getAuth, signInAnonymously, type User } from 'firebase/auth'
+import { get, getDatabase, onValue, ref, set, update } from 'firebase/database'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import type { Room } from '~/models/room'
@@ -29,7 +29,20 @@ export function useFirebase() {
   const [user, setUser] = useState<User | null>(null)
   const [room, setRoom] = useState<Room | null>(null)
 
-  function createRoom(name: string, username: string, points: string) {
+  async function signInUser() {
+    const auth = getAuth()
+    try {
+      await signInAnonymously(auth)
+      const currentUser = auth.currentUser
+      if (currentUser) {
+        setUser(currentUser)
+      }
+    } catch (error) {
+      console.error('Error signing in:', error)
+    }
+  }
+
+  async function createRoom(name: string, username: string, points: string) {
     const array = new Uint8Array(8)
     window.crypto.getRandomValues(array)
     const roomCode = Array.from(array, (byte) =>
@@ -52,6 +65,8 @@ export function useFirebase() {
         },
       ],
     })
+
+    return code
   }
 
   function getRoomRef(code: string) {
@@ -60,31 +75,142 @@ export function useFirebase() {
     return roomRef
   }
 
-  function joinRoom(code: string, username: string) {
+  async function joinRoom(code: string, username: string) {
     if (!user) {
       throw new Error('User must be authenticated to join a room')
     }
 
     const roomRef = ref(database, `rooms/${code}`)
 
-    set(roomRef, (prevRoom: any) => {
+    try {
+      const snapshot = await get(roomRef)
+      const prevRoom = snapshot.val()
+
       if (!prevRoom) {
         throw new Error('Room does not exist')
+      }
+
+      const existingUser = prevRoom.users?.find((u: any) => u.uid === user.uid)
+      if (existingUser) {
+        return
       }
 
       const updatedUsers = [
         ...(prevRoom.users || []),
         { uid: user.uid, name: username, vote: '' },
       ]
-      return { ...prevRoom, users: updatedUsers }
-    })
+
+      await update(roomRef, { users: updatedUsers })
+    } catch (error) {
+      console.error('Error joining room:', error)
+    }
+  }
+
+  async function leaveRoom(code: string) {
+    if (!user) {
+      return
+    }
+
+    const roomRef = ref(database, `rooms/${code}`)
+
+    try {
+      const snapshot = await get(roomRef)
+      const prevRoom = snapshot.val()
+
+      if (!prevRoom || !prevRoom.users) {
+        return
+      }
+
+      const updatedUsers = prevRoom.users.filter((u: any) => u.uid !== user.uid)
+
+      if (updatedUsers.length === 0) {
+        await set(roomRef, null)
+      } else {
+        await update(roomRef, { users: updatedUsers })
+      }
+    } catch (error) {
+      console.error('Error leaving room:', error)
+    }
+  }
+
+  async function vote(voteValue: string) {
+    if (!user) {
+      throw new Error('User must be authenticated to vote')
+    }
+
+    const roomRef = ref(database, `rooms/${roomCode}`)
+
+    try {
+      const snapshot = await get(roomRef)
+      const prevRoom = snapshot.val()
+
+      if (!prevRoom) {
+        throw new Error('Room does not exist')
+      }
+
+      if (!prevRoom.users) {
+        throw new Error('No users in room')
+      }
+      console.log(prevRoom)
+      console.log(user)
+      const userIndex = prevRoom.users.findIndex((u: any) => u.uid === user.uid)
+
+      if (userIndex === -1) {
+        throw new Error('User is not in this room')
+      }
+
+      const updatedUsers = [...prevRoom.users]
+      updatedUsers[userIndex] = {
+        ...updatedUsers[userIndex],
+        vote: voteValue,
+      }
+
+      await update(roomRef, { users: updatedUsers })
+    } catch (error) {
+      console.error('Error voting:', error)
+      throw error
+    }
+  }
+
+  async function resetVotes() {
+    if (!user) {
+      throw new Error('User must be authenticated to reset votes')
+    }
+
+    const roomRef = ref(database, `rooms/${roomCode}`)
+
+    try {
+      const snapshot = await get(roomRef)
+      const prevRoom = snapshot.val()
+
+      if (!prevRoom) {
+        throw new Error('Room does not exist')
+      }
+
+      if (!prevRoom.users) {
+        throw new Error('No users in room')
+      }
+
+      if (prevRoom.ownerUid !== user.uid) {
+        throw new Error('Only the room owner can reset votes')
+      }
+
+      const updatedUsers = prevRoom.users.map((u: any) => ({
+        ...u,
+        vote: '',
+      }))
+
+      await update(roomRef, { users: updatedUsers })
+    } catch (error) {
+      throw error
+    }
   }
 
   useEffect(() => {
     if (!roomCode) return
 
     const roomRef = ref(database, `rooms/${roomCode}`)
-    
+
     const unsub = onValue(roomRef, (snapshot) => {
       const data = snapshot.val()
 
@@ -111,7 +237,47 @@ export function useFirebase() {
     })
 
     return () => unsubscribe()
-  }, [])
+  }, [signInUser])
 
-  return { app, analytics, user, createRoom, joinRoom, getRoomRef, room }
+  useEffect(() => {
+    if (!roomCode || !user) return
+
+    const handleBeforeUnload = () => {
+      try {
+        leaveRoom(roomCode as string)
+      } catch (error) {
+        console.error('Error during beforeunload cleanup:', error)
+      }
+    }
+
+    const handleUnload = () => {
+      leaveRoom(roomCode as string).catch(console.error)
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    window.addEventListener('unload', handleUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      window.removeEventListener('unload', handleUnload)
+
+      if (roomCode && user) {
+        leaveRoom(roomCode as string).catch(console.error)
+      }
+    }
+  }, [roomCode, user])
+
+  return {
+    app,
+    analytics,
+    user,
+    room,
+    createRoom,
+    joinRoom,
+    getRoomRef,
+    signInUser,
+    leaveRoom,
+    vote,
+    resetVotes,
+  }
 }

@@ -1,34 +1,44 @@
 'use client'
-import { Flex, HStack } from '@chakra-ui/react'
-import { useParams } from 'next/navigation'
+import { Button, Flex, HStack, Stack, Text } from '@chakra-ui/react'
+import { useState } from 'react'
+import { FaCheckCircle, FaClock } from 'react-icons/fa'
+import { MdRemoveRedEye } from 'react-icons/md'
+import { RiResetLeftLine } from 'react-icons/ri'
 import Cards from '~/components/Cards'
 import Robot from '~/components/Robots'
 import { useFirebase } from '~/hooks/useFirebase'
 
 export default function RoomPage() {
-  const { room } = useParams()
-  const { room: dbRoom } = useFirebase()
-
-  console.log('Room:', dbRoom)
+  const { room, resetVotes } = useFirebase()
+  const [revealVotes, setRevealVotes] = useState(false)
 
   const robots =
-    room
-      ?.toString()
-      .split('')
-      .map((char) => {
-        return `https://api.dicebear.com/9.x/bottts-neutral/png?seed=${char}`
-      }) ?? []
+    room?.users.map((user) => {
+      return {
+        avatar: `https://api.dicebear.com/9.x/bottts-neutral/png?seed=${user.uid}`,
+        name: user.name,
+        vote: user.vote,
+      }
+    }) ?? []
 
   const halfLength = Math.ceil(robots.length / 2)
 
   const firstHalf = robots.slice(0, halfLength)
   const secondHalf = robots.slice(halfLength)
 
-  const justifyRobots = (list: string[]) => {
+  const justifyRobots = (list: any[]) => {
     if (list.length % 2 === 0 && list.length > 2) {
       return 'space-between'
     }
     return 'space-evenly'
+  }
+
+  function handleVotes() {
+    if (revealVotes) {
+      resetVotes()
+    }
+
+    setRevealVotes((prev) => !prev)
   }
 
   return (
@@ -50,7 +60,18 @@ export default function RoomPage() {
       >
         <HStack w={'full'} justify={justifyRobots(firstHalf)} gap={10}>
           {firstHalf?.map((robot) => (
-            <Robot key={robot} avatar={robot} name={robot} />
+            <Stack key={robot.avatar} align={'center'} gap={2}>
+              {robot.vote && robot.vote !== '' && (
+                <FaCheckCircle color='green' />
+              )}
+              {robot.vote === '' && <FaClock color='gray' />}
+              <Robot
+                avatar={robot.avatar}
+                name={robot.name}
+                vote={robot.vote}
+                revealVotes={revealVotes}
+              />
+            </Stack>
           ))}
         </HStack>
         <Flex
@@ -62,16 +83,43 @@ export default function RoomPage() {
           justify={'center'}
           borderColor={'#C0C0C0'}
           borderWidth={4}
+          direction='column'
         >
-          Agurdardando votos...
+          {room?.users.some((user) => !user.vote) && (
+            <Text>Agurdardando votos...</Text>
+          )}
+          <Button
+            colorPalette='orange'
+            variant='outline'
+            size='md'
+            onClick={handleVotes}
+            style={{
+              borderColor: '#DD6B20',
+              fontWeight: 600,
+              backgroundColor: revealVotes ? '#DD6B20' : 'transparent',
+              color: revealVotes ? 'white' : '#DD6B20',
+            }}
+          >
+            {revealVotes && <RiResetLeftLine />}
+            {!revealVotes && <MdRemoveRedEye />}
+            {revealVotes ? 'Nova votação' : 'Revelar votos'}
+          </Button>
         </Flex>
         <HStack w={'full'} justify={justifyRobots(secondHalf)} gap={10}>
           {secondHalf?.map((robot) => (
-            <Robot key={robot} avatar={robot} name={robot} />
+            <Robot
+              key={robot.avatar}
+              avatar={robot.avatar}
+              name={robot.name}
+              revealVotes={revealVotes}
+            />
           ))}
         </HStack>
       </Flex>
-      <Cards cards={['0.5', '1', '1.5', '2', '2.5', '3']} />
+      <Cards
+        canVote={!revealVotes}
+        cards={['0.5', '1', '1.5', '2', '2.5', '3']}
+      />
     </Flex>
   )
 }
