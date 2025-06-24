@@ -24,33 +24,5 @@ export function useRoom() {
     return () => unsub()
   }, [roomCode, ctx.database])
 
-  useEffect(() => {
-    if (!roomCode || !ctx.user) return
-
-    const handleBeforeUnload = () => {
-      try {
-        ctx.leaveRoom(roomCode as string)
-      } catch (error) {
-        console.error('Error during beforeunload cleanup:', error)
-      }
-    }
-
-    const handleUnload = () => {
-      ctx.leaveRoom(roomCode as string).catch(console.error)
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    window.addEventListener('unload', handleUnload)
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-      window.removeEventListener('unload', handleUnload)
-
-      if (roomCode && ctx.user) {
-        ctx.leaveRoom(roomCode as string).catch(console.error)
-      }
-    }
-  }, [roomCode, ctx.user, ctx.leaveRoom])
-
   return { room }
 }

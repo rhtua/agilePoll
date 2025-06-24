@@ -9,7 +9,7 @@ import {
   set,
   update,
 } from 'firebase/database'
-import { createContext } from 'react'
+import { createContext, useCallback, useEffect } from 'react'
 import { firebaseConfig } from '~/config'
 import { generateRandomCode } from '~/helpers/randomCode'
 import { useRoom } from '~/hooks/useRoom'
@@ -47,111 +47,120 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
   const { room } = useRoom()
 
-  async function createRoom(name: string, username: string, points: string) {
-    const code = generateRandomCode()
+  const createRoom = useCallback(
+    async (name: string, username: string, points: string) => {
+      const code = generateRandomCode()
 
-    set(ref(database, `rooms/${code}`), {
-      code,
-      name,
-      points,
-      createdAt: new Date().toISOString(),
-      ownerUid: user?.uid,
-      users: [
-        {
-          uid: user?.uid || '',
-          name: username,
-          vote: '',
-        },
-      ],
-    })
+      set(ref(database, `rooms/${code}`), {
+        code,
+        name,
+        points,
+        createdAt: new Date().toISOString(),
+        ownerUid: user?.uid,
+        users: [
+          {
+            uid: user?.uid || '',
+            name: username,
+            vote: '',
+          },
+        ],
+      })
 
-    return code
-  }
+      return code
+    },
+    [user],
+  )
 
-  async function joinRoom(code: string, username: string) {
-    if (!user) {
-      throw new Error('User must be authenticated to join a room')
-    }
+  const joinRoom = useCallback(
+    async (code: string, username: string) => {
+      if (!user) {
+        throw new Error('User must be authenticated to join a room')
+      }
 
-    const roomRef = ref(database, `rooms/${code}`)
+      const roomRef = ref(database, `rooms/${code}`)
 
-    const snapshot = await get(roomRef)
-    const prevRoom = snapshot.val()
+      const snapshot = await get(roomRef)
+      const prevRoom = snapshot.val()
 
-    if (!prevRoom) {
-      throw new Error('Room does not exist')
-    }
+      if (!prevRoom) {
+        throw new Error('Room does not exist')
+      }
 
-    const existingUser = prevRoom.users?.find((u: any) => u.uid === user.uid)
-    if (existingUser) {
-      return
-    }
+      const existingUser = prevRoom.users?.find((u: any) => u.uid === user.uid)
+      if (existingUser) {
+        return
+      }
 
-    const updatedUsers = [
-      ...(prevRoom.users || []),
-      { uid: user.uid, name: username, vote: '' },
-    ]
+      const updatedUsers = [
+        ...(prevRoom.users || []),
+        { uid: user.uid, name: username, vote: '' },
+      ]
 
-    await update(roomRef, { users: updatedUsers })
-  }
-
-  async function leaveRoom(code: string) {
-    if (!user) {
-      return
-    }
-
-    const roomRef = ref(database, `rooms/${code}`)
-
-    const snapshot = await get(roomRef)
-    const prevRoom = snapshot.val()
-
-    if (!prevRoom || !prevRoom.users) {
-      return
-    }
-
-    const updatedUsers = prevRoom.users.filter((u: any) => u.uid !== user.uid)
-
-    if (updatedUsers.length === 0) {
-      await set(roomRef, null)
-    } else {
       await update(roomRef, { users: updatedUsers })
-    }
-  }
+    },
+    [user],
+  )
 
-  async function vote(voteValue: string) {
-    if (!user) {
-      throw new Error('User must be authenticated to vote')
-    }
+  const leaveRoom = useCallback(
+    async (code: string) => {
+      if (!user) {
+        return
+      }
 
-    const roomRef = ref(database, `rooms/${room!.code}`)
+      const roomRef = ref(database, `rooms/${code}`)
 
-    const snapshot = await get(roomRef)
-    const prevRoom = snapshot.val()
+      const snapshot = await get(roomRef)
+      const prevRoom = snapshot.val()
 
-    if (!prevRoom) {
-      throw new Error('Room does not exist')
-    }
+      if (!prevRoom || !prevRoom.users) {
+        return
+      }
 
-    if (!prevRoom.users) {
-      throw new Error('No users in room')
-    }
+      const updatedUsers =
+        prevRoom.users.filter((u: any) => u.uid !== user.uid) ?? []
 
-    const userIndex = prevRoom.users.findIndex((u: any) => u.uid === user.uid)
+      await update(roomRef, { users: updatedUsers })
+    },
+    [user],
+  )
 
-    if (userIndex === -1) {
-      throw new Error('User is not in this room')
-    }
+  const vote = useCallback(
+    async (voteValue: string) => {
+      if (!user) {
+        throw new Error('User must be authenticated to vote')
+      }
 
-    const updatedUsers = [...prevRoom.users]
-    updatedUsers[userIndex] = {
-      ...updatedUsers[userIndex],
-      vote: voteValue,
-    }
+      const roomRef = ref(database, `rooms/${room!.code}`)
 
-    await update(roomRef, { users: updatedUsers })
-  }
+      const snapshot = await get(roomRef)
+      const prevRoom = snapshot.val()
 
-  async function resetVotes() {
+      if (!prevRoom) {
+        throw new Error('Room does not exist')
+      }
+
+      if (!prevRoom.users) {
+        throw new Error('No users in room')
+      }
+
+      const userIndex = prevRoom.users.findIndex((u: any) => u.uid === user.uid)
+
+      if (userIndex === -1) {
+        throw new Error('User is not in this room')
+      }
+
+      const updatedUsers = [...prevRoom.users]
+      updatedUsers[userIndex] = {
+        ...updatedUsers[userIndex],
+        vote: voteValue,
+      }
+
+      await update(roomRef, { users: updatedUsers })
+    },
+    [room, user],
+  )
+
+  const resetVotes = useCallback(async () => {
     if (!user) {
       throw new Error('User must be authenticated to reset votes')
     }
@@ -179,7 +188,17 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
     }))
 
     await update(roomRef, { users: updatedUsers })
-  }
+  }, [room, user])
+
+  useEffect(() => {
+    async function handleBeforeUnload() {
+      if (room) {
+        await leaveRoom(room.code)
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+  }, [leaveRoom, room])
 
   return (
     <RoomContext.Provider
