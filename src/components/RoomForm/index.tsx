@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation'
 import { type FormEvent, use, useState } from 'react'
 import { withMask } from 'use-mask-input'
 import { RoomContext } from '~/contexts/room'
+import { toaster } from '../ui/toaster'
 export function RoomForm() {
   const { createRoom, joinRoom } = use(RoomContext)
   const router = useRouter()
@@ -54,13 +55,20 @@ export function RoomForm() {
     try {
       setLoading('join')
       await joinRoom(code, userName)
-      router.push(`/room/${code}`)
     } catch (e) {
-      console.error('Error joining room:', e)
+      toaster.create({
+        title: 'Erro ao entrar na sala',
+        description: 'Verifique o código e tente novamente.',
+        type: 'error',
+      })
+
       setLoading(undefined)
+      console.log('returning from joinRoom')
+      console.error('Error joining room:', e)
+      return
     }
 
-    router.push(`/room/${formData.get('code')}`)
+    router.push(`/room/${code}`)
   }
 
   return (

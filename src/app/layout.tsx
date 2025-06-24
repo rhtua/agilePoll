@@ -4,6 +4,7 @@ import PageLayout from '~/components/PageLayout'
 import { Provider } from '~/components/ui/provider'
 import { RoomProvider } from '~/contexts/room'
 import './global.css'
+import { Toaster } from '~/components/ui/toaster'
 
 const urbanist = Urbanist({
   subsets: ['latin'],
@@ -27,6 +28,7 @@ export default function RootLayout({
           <RoomProvider>
             <PageLayout>{children}</PageLayout>
           </RoomProvider>
+          <Toaster />
         </Provider>
       </body>
     </html>

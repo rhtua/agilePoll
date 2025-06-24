@@ -1,7 +1,7 @@
 'use client'
 import { Button, Flex, HStack, Spacer } from '@chakra-ui/react'
 import Image from 'next/image'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { use } from 'react'
 import { AiOutlineUserAdd } from 'react-icons/ai'
 import { LiaUserAstronautSolid } from 'react-icons/lia'
@@ -15,6 +15,7 @@ export default function PageLayout({
 }>) {
   const { room } = useParams()
   const { user, room: roomData } = use(RoomContext)
+  const router = useRouter()
 
   return (
     <Flex
@@ -31,7 +32,10 @@ export default function PageLayout({
           alt='Logo'
           width={120}
           height={100}
-          style={{ objectFit: 'contain' }}
+          onClick={() => {
+            router.push('/')
+          }}
+          style={{ objectFit: 'contain', cursor: 'pointer' }}
         />
         <Spacer />
         {room && (
