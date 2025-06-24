@@ -1,23 +1,52 @@
 'use client'
-import { Button, Flex, HStack, Stack, Text } from '@chakra-ui/react'
-import { use, useCallback, useMemo, useState } from 'react'
+import {
+  Button,
+  chakra,
+  Flex,
+  HStack,
+  Spinner,
+  Stack,
+  Text,
+} from '@chakra-ui/react'
+import { useRouter } from 'next/navigation'
+import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { FaCheckCircle, FaClock } from 'react-icons/fa'
 import { MdRemoveRedEye } from 'react-icons/md'
 import { RiResetLeftLine } from 'react-icons/ri'
 import Cards from '~/components/Cards'
+import JoinRoomComponent from '~/components/JoinRoom'
 import Robot from '~/components/Robots'
+import { toaster } from '~/components/ui/toaster'
 import { RoomContext } from '~/contexts/room'
 import mapUsersToRobots, { type RobotType } from '~/mappers/usersToRobots'
 
 export default function RoomPage() {
-  const { room, resetVotes } = use(RoomContext)
+  const { room, resetVotes, isLoading, user } = use(RoomContext)
+  const router = useRouter()
   const [revealVotes, setRevealVotes] = useState(false)
 
   const { firstHalf, secondHalf } = mapUsersToRobots(room?.users || [])
 
+  useEffect(() => {
+    if (!room && !isLoading) {
+      router.push('/')
+      toaster.create({
+        title: 'Sala não encontrada',
+        description:
+          'A sala que você está tentando acessar não existe ou foi removida.',
+        type: 'error',
+      })
+    }
+  }, [room, isLoading, router])
+
   const hasPendingVotes = useMemo(
-    () => room?.users.some((user) => !user.vote),
+    () => room?.users?.some((user) => !user.vote),
     [room?.users],
+  )
+
+  const isRoomOwner = useMemo(
+    () => room?.ownerUid === user?.uid,
+    [room?.ownerUid, user?.uid],
   )
 
   const buttonStyles = useMemo(
@@ -78,6 +107,21 @@ export default function RoomPage() {
     setRevealVotes((prev) => !prev)
   }
 
+  if (isLoading) {
+    return (
+      <Flex w='full' h='full' justify='center' align='center' bgColor='#F1F1F1'>
+        <Flex direction='column' align='center' gap={4}>
+          <Spinner size='xl' color='orange.500' />
+          <Text fontSize='xl'>Carregando...</Text>
+        </Flex>
+      </Flex>
+    )
+  }
+
+  if (!room?.users?.some((roomuser) => roomuser.uid === user?.uid)) {
+    return <JoinRoomComponent />
+  }
+
   return (
     <Flex
       w='full'
@@ -100,6 +144,9 @@ export default function RoomPage() {
         <Flex
           w='full'
           h='15vh'
+          px={5}
+          py={2}
+          gap={2}
           bgColor={'#FBFBFB'}
           borderRadius='lg'
           align={'center'}
@@ -108,17 +155,21 @@ export default function RoomPage() {
           borderWidth={4}
           direction='column'
         >
-          {hasPendingVotes && <Text>Aguardando votos...</Text>}
-          <Button
-            colorPalette='orange'
-            variant='outline'
-            size='md'
-            onClick={handleVotes}
-            style={buttonStyles}
-          >
-            {revealVotes ? <RiResetLeftLine /> : <MdRemoveRedEye />}
-            {revealVotes ? 'Nova votação' : 'Revelar votos'}
-          </Button>
+          <Text>
+            {hasPendingVotes ? 'Aguardando votos...' : 'Votação concluída!'}
+          </Text>
+          {isRoomOwner && (
+            <Button
+              colorPalette='orange'
+              variant='outline'
+              size='md'
+              onClick={handleVotes}
+              style={buttonStyles}
+            >
+              {revealVotes ? <RiResetLeftLine /> : <MdRemoveRedEye />}
+              {revealVotes ? 'Nova votação' : 'Revelar votos'}
+            </Button>
+          )}
         </Flex>
 
         {createRobots(secondHalf, false)}

@@ -34,7 +34,7 @@ const CardsIcon = createIcon({
 export default function Cards({ cards, canVote }: CardsProps) {
   const { vote, user, room } = use(RoomContext)
 
-  const myVote = room?.users.find((u) => u.uid === user?.uid)?.vote
+  const myVote = room?.users?.find((u) => u.uid === user?.uid)?.vote
 
   function handleCardClick(card: string) {
     if (!canVote) return

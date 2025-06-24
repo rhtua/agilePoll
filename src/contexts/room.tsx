@@ -22,6 +22,7 @@ const database = getDatabase(app)
 export const RoomContext = createContext<{
   user: User | null
   room: Room | null
+  isLoading: boolean
   database: Database
   createRoom: (
     name: string,
@@ -35,6 +36,7 @@ export const RoomContext = createContext<{
 }>({
   user: null,
   room: null,
+  isLoading: true,
   database,
   createRoom: null as any,
   joinRoom: null as any,
@@ -45,7 +47,7 @@ export const RoomContext = createContext<{
 
 export function RoomProvider({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
-  const { room } = useRoom()
+  const { room, isLoading } = useRoom()
 
   const createRoom = useCallback(
     async (name: string, username: string, points: string) => {
@@ -205,6 +207,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         room,
+        isLoading,
         database,
         createRoom,
         joinRoom,

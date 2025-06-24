@@ -12,10 +12,10 @@ export default function mapUsersToRobots(users: User[] | undefined): {
   firstHalf: RobotType[]
   secondHalf: RobotType[]
 } {
-  if (!users || users.length === 0) return { firstHalf: [], secondHalf: [] }
+  if (!users || users?.length === 0) return { firstHalf: [], secondHalf: [] }
 
   const robots =
-    users.map((user) => {
+    users?.map((user) => {
       return {
         avatar: `${ROBOT_AVATAR_URL}${user.uid}`,
         name: user.name,

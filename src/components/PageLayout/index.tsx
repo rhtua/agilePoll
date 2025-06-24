@@ -63,7 +63,7 @@ export default function PageLayout({
               }}
             >
               <LiaUserAstronautSolid />{' '}
-              {roomData?.users.find((u) => u.uid === user?.uid)?.name ||
+              {roomData?.users?.find((u) => u.uid === user?.uid)?.name ||
                 'Usuário'}
               <MdKeyboardArrowDown />
             </Button>

@@ -9,20 +9,25 @@ export function useRoom() {
 
   const { room: roomCode } = useParams()
   const [room, setRoom] = useState<Room | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (!roomCode) return
+    if (!roomCode) {
+      setIsLoading(false)
+      return
+    }
+    if (!room) setIsLoading(true)
 
     const roomRef = ref(ctx.database, `rooms/${roomCode}`)
 
     const unsub = onValue(roomRef, (snapshot) => {
       const data = snapshot.val()
-
       setRoom(data || null)
+      setIsLoading(false)
     })
 
     return () => unsub()
-  }, [roomCode, ctx.database])
+  }, [roomCode, ctx.database, room])
 
-  return { room }
+  return { room, isLoading }
 }

@@ -7,73 +7,102 @@ import {
   Input,
   Text,
 } from '@chakra-ui/react'
-import type { Room, User } from '~/models/room'
+import { useRouter } from 'next/navigation'
+import router from 'next/router'
+import { type FormEvent, use, useState } from 'react'
+import { RoomContext } from '~/contexts/room'
+import { toaster } from '../ui/toaster'
 
-interface JoinRoomProps {
-  room: Room | null
-  user: User | null
-}
+export default function JoinRoomComponent() {
+  const router = useRouter()
+  const { room, joinRoom } = use(RoomContext)
+  const [loading, setLoading] = useState(false)
 
-export default function LoadingJoinRom({ room, user }: JoinRoomProps) {
-  if (!room) {
-    return (
-      <Flex w='full' h='full' justify='center' align='center' bgColor='#F1F1F1'>
-        <Text fontSize='xl'>Carregando...</Text>
-      </Flex>
-    )
+  async function handleJoinRoom(ev: FormEvent<HTMLFormElement>) {
+    ev.preventDefault()
+    const formData = new FormData(ev.currentTarget)
+    const userName = formData.get('userName') as string
+
+    if (!userName || !room?.code) {
+      return
+    }
+
+    try {
+      setLoading(true)
+      await joinRoom(room.code, userName)
+    } catch (e) {
+      router.push('/')
+      toaster.create({
+        title: 'Erro ao entrar na sala',
+        description: 'Verifique o código e tente novamente.',
+        type: 'error',
+      })
+
+      setLoading(false)
+      console.error('Error joining room:', e)
+      return
+    }
   }
 
-  if (!room.users.some((u) => u.uid === user?.uid)) {
-    // If the user is not in the room, show a field to type the name
-    return (
-      <Flex w='full' h='full' justify='center' align='center'>
-        <Flex
-          w={{ base: '80vw', lg: '40vw' }}
-          justify='center'
-          align='center'
-          bgColor='white'
-          shadow={'md'}
-          p={5}
+  return (
+    <Flex
+      w='full'
+      h='full'
+      justify='center'
+      align='center'
+      direction={'column'}
+      gap={5}
+      bgImage="url('/homeBg.png')"
+      bgSize='100% 100%'
+      bgRepeat='no-repeat'
+    >
+      <Text fontSize='xl'>
+        Voce está entrando na sala: <strong>{room?.name}</strong>{' '}
+      </Text>
+      <Flex
+        w={{ base: '80vw', lg: '30vw' }}
+        justify='center'
+        align='center'
+        bgColor='white'
+        shadow={'md'}
+        p={5}
+        gap={5}
+        direction={'column'}
+        borderRadius='lg'
+      >
+        <chakra.form
+          display='flex'
+          flexDir='column'
+          w='full'
           gap={5}
-          direction={'column'}
-          borderRadius='md'
+          onSubmit={handleJoinRoom}
         >
-          <Text fontSize='xl'>Voce está entrando na sala {room.name}</Text>
-          <chakra.form
-            display='flex'
-            flexDir='column'
-            w='50%'
-            gap={3}
-            // onSubmit={handleJoinRoom}
+          <HStack w='full'>
+            <Field.Root required>
+              <Field.Label>Seu nome</Field.Label>
+              <Input name='userName' placeholder='Digite o seu nome' />
+            </Field.Root>
+          </HStack>
+          <Button
+            w='fit'
+            mx='auto'
+            px={7}
+            colorPalette='orange'
+            variant='outline'
+            size='md'
+            loading={loading}
+            style={{
+              borderColor: '#DD6B20',
+              fontWeight: 600,
+              fontSize: 16,
+              color: '#DD6B20',
+            }}
+            type='submit'
           >
-            <HStack w='full'>
-              <Field.Root required>
-                <Field.Label>Seu nome</Field.Label>
-                <Input name='userName' placeholder='Digite o seu nome' />
-              </Field.Root>
-            </HStack>
-            <Button
-              w='fit'
-              mx='auto'
-              px={7}
-              colorPalette='orange'
-              variant='outline'
-              size='md'
-              style={{
-                borderColor: '#DD6B20',
-                fontWeight: 600,
-                fontSize: 16,
-                color: '#DD6B20',
-              }}
-              type='submit'
-            >
-              Entrar na sala
-            </Button>
-          </chakra.form>
-        </Flex>
+            Entrar na sala
+          </Button>
+        </chakra.form>
       </Flex>
-    )
-  }
-
-  return undefined
+    </Flex>
+  )
 }

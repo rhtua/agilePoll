@@ -14,6 +14,7 @@ import { type FormEvent, use, useState } from 'react'
 import { withMask } from 'use-mask-input'
 import { RoomContext } from '~/contexts/room'
 import { toaster } from '../ui/toaster'
+
 export function RoomForm() {
   const { createRoom, joinRoom } = use(RoomContext)
   const router = useRouter()
