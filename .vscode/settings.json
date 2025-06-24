@@ -12,5 +12,8 @@
     "activityBar.background": "#372060",
     "titleBar.activeBackground": "#4D2D86",
     "titleBar.activeForeground": "#FCFBFE"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
   }
 }

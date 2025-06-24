@@ -2,10 +2,11 @@
 import { Button, Flex, HStack, Spacer } from '@chakra-ui/react'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
+import { use } from 'react'
 import { AiOutlineUserAdd } from 'react-icons/ai'
 import { LiaUserAstronautSolid } from 'react-icons/lia'
 import { MdKeyboardArrowDown } from 'react-icons/md'
-import { useFirebase } from '~/hooks/useFirebase'
+import { RoomContext } from '~/contexts/room'
 
 export default function PageLayout({
   children,
@@ -13,7 +14,7 @@ export default function PageLayout({
   children: React.ReactNode
 }>) {
   const { room } = useParams()
-  const { user, room: roomData } = useFirebase()
+  const { user, room: roomData } = use(RoomContext)
 
   return (
     <Flex

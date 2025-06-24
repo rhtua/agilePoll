@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Urbanist } from 'next/font/google'
 import PageLayout from '~/components/PageLayout'
 import { Provider } from '~/components/ui/provider'
+import { RoomProvider } from '~/contexts/room'
 import './global.css'
 
 const urbanist = Urbanist({
@@ -23,7 +24,9 @@ export default function RootLayout({
     <html suppressHydrationWarning lang='en'>
       <body className={urbanist.className}>
         <Provider>
-          <PageLayout>{children}</PageLayout>
+          <RoomProvider>
+            <PageLayout>{children}</PageLayout>
+          </RoomProvider>
         </Provider>
       </body>
     </html>

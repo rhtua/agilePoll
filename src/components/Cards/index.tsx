@@ -1,6 +1,7 @@
 'use client'
 import { createIcon, Flex, Text } from '@chakra-ui/react'
-import { useFirebase } from '~/hooks/useFirebase'
+import { use } from 'react'
+import { RoomContext } from '~/contexts/room'
 
 interface CardsProps {
   cards: string[]
@@ -31,7 +32,7 @@ const CardsIcon = createIcon({
 })
 
 export default function Cards({ cards, canVote }: CardsProps) {
-  const { vote, user, room } = useFirebase()
+  const { vote, user, room } = use(RoomContext)
 
   const myVote = room?.users.find((u) => u.uid === user?.uid)?.vote
 
@@ -78,13 +79,13 @@ export default function Cards({ cards, canVote }: CardsProps) {
                   borderBottomWidth: 3,
                   borderBottomLeftRadius: 'lg',
                   borderBottomRightRadius: 'lg',
-                  '& > :nth-child(2)': {
+                  '& > :nth-of-type(2)': {
                     transform: 'translateY(-15px)',
                   },
-                  '& > :nth-child(3)': {
+                  '& > :nth-of-type(3)': {
                     transform: 'translateY(-15px)',
                   },
-                  '& > :nth-child(4)': {
+                  '& > svg': {
                     transform: 'translateY(-15px)',
                   },
                 }
@@ -93,13 +94,13 @@ export default function Cards({ cards, canVote }: CardsProps) {
           css={
             myVote === card
               ? {
-                  '& > :nth-child(2)': {
+                  '& > :nth-of-type(2)': {
                     transform: 'translateY(-15px)',
                   },
-                  '& > :nth-child(3)': {
+                  '& > :nth-of-type(3)': {
                     transform: 'translateY(-15px)',
                   },
-                  '& > :nth-child(4)': {
+                  '& > svg': {
                     transform: 'translateY(-15px)',
                   },
                 }

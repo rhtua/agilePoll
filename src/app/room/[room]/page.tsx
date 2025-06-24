@@ -1,15 +1,15 @@
 'use client'
 import { Button, Flex, HStack, Stack, Text } from '@chakra-ui/react'
-import { useState } from 'react'
+import { use, useState } from 'react'
 import { FaCheckCircle, FaClock } from 'react-icons/fa'
 import { MdRemoveRedEye } from 'react-icons/md'
 import { RiResetLeftLine } from 'react-icons/ri'
 import Cards from '~/components/Cards'
 import Robot from '~/components/Robots'
-import { useFirebase } from '~/hooks/useFirebase'
+import { RoomContext } from '~/contexts/room'
 
 export default function RoomPage() {
-  const { room, resetVotes } = useFirebase()
+  const { room, resetVotes } = use(RoomContext)
   const [revealVotes, setRevealVotes] = useState(false)
 
   const robots =

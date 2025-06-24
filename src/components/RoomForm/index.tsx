@@ -10,21 +10,15 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/navigation'
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, use, useState } from 'react'
 import { withMask } from 'use-mask-input'
-import { useFirebase } from '~/hooks/useFirebase'
+import { RoomContext } from '~/contexts/room'
 export function RoomForm() {
-  const { createRoom, signInUser, joinRoom, user } = useFirebase()
+  const { createRoom, joinRoom } = use(RoomContext)
   const router = useRouter()
   const [loading, setLoading] = useState<'join' | 'create' | undefined>(
     undefined,
   )
-
-  useEffect(() => {
-    if (!user) {
-      signInUser()
-    }
-  }, [user, signInUser])
 
   async function handleCreateRoom(ev: FormEvent<HTMLFormElement>) {
     ev.preventDefault()
