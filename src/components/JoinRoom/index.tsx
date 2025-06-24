@@ -8,8 +8,7 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/navigation'
-import router from 'next/router'
-import { type FormEvent, use, useState } from 'react'
+import { type FormEvent, use, useCallback, useEffect, useState } from 'react'
 import { RoomContext } from '~/contexts/room'
 import { toaster } from '../ui/toaster'
 
@@ -18,31 +17,46 @@ export default function JoinRoomComponent() {
   const { room, joinRoom } = use(RoomContext)
   const [loading, setLoading] = useState(false)
 
-  async function handleJoinRoom(ev: FormEvent<HTMLFormElement>) {
+  const storedUserName = sessionStorage.getItem(room?.code || '')
+
+  const handleJoinRoom = useCallback(
+    async (code: string, userName: string) => {
+      if (!userName || !code) {
+        return
+      }
+
+      try {
+        setLoading(true)
+        await joinRoom(code, userName)
+      } catch (e) {
+        router.push('/')
+        toaster.create({
+          title: 'Erro ao entrar na sala',
+          description: 'Verifique o código e tente novamente.',
+          type: 'error',
+        })
+
+        setLoading(false)
+        console.error('Error joining room:', e)
+        return
+      }
+    },
+    [joinRoom, router.push],
+  )
+
+  async function handleSubmit(ev: FormEvent<HTMLFormElement>) {
     ev.preventDefault()
     const formData = new FormData(ev.currentTarget)
     const userName = formData.get('userName') as string
 
-    if (!userName || !room?.code) {
-      return
-    }
-
-    try {
-      setLoading(true)
-      await joinRoom(room.code, userName)
-    } catch (e) {
-      router.push('/')
-      toaster.create({
-        title: 'Erro ao entrar na sala',
-        description: 'Verifique o código e tente novamente.',
-        type: 'error',
-      })
-
-      setLoading(false)
-      console.error('Error joining room:', e)
-      return
-    }
+    await handleJoinRoom(room?.code || '', userName)
   }
+
+  useEffect(() => {
+    if (storedUserName && room?.code) {
+      handleJoinRoom(room.code || '', storedUserName)
+    }
+  }, [room?.code, storedUserName, handleJoinRoom])
 
   return (
     <Flex
@@ -75,12 +89,16 @@ export default function JoinRoomComponent() {
           flexDir='column'
           w='full'
           gap={5}
-          onSubmit={handleJoinRoom}
+          onSubmit={handleSubmit}
         >
           <HStack w='full'>
             <Field.Root required>
               <Field.Label>Seu nome</Field.Label>
-              <Input name='userName' placeholder='Digite o seu nome' />
+              <Input
+                name='userName'
+                placeholder='Digite o seu nome'
+                defaultValue={storedUserName ?? ''}
+              />
             </Field.Root>
           </HStack>
           <Button

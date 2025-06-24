@@ -53,6 +53,8 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
     async (name: string, username: string, points: string) => {
       const code = generateRandomCode()
 
+      sessionStorage.setItem(code, username)
+
       set(ref(database, `rooms/${code}`), {
         code,
         name,
@@ -99,6 +101,8 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       ]
 
       await update(roomRef, { users: updatedUsers })
+
+      sessionStorage.setItem(code, username)
     },
     [user],
   )
@@ -192,15 +196,19 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
     await update(roomRef, { users: updatedUsers })
   }, [room, user])
 
-  useEffect(() => {
-    async function handleBeforeUnload() {
-      if (room) {
-        await leaveRoom(room.code)
-      }
+  const handleBeforeUnload = useCallback(async () => {
+    if (room) {
+      await leaveRoom(room.code)
     }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
   }, [leaveRoom, room])
+
+  useEffect(() => {
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [handleBeforeUnload])
 
   return (
     <RoomContext.Provider
