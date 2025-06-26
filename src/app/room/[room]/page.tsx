@@ -1,7 +1,6 @@
 'use client'
 import { Button, Flex, HStack, Spinner, Stack, Text } from '@chakra-ui/react'
-import { useRouter } from 'next/navigation'
-import { use, useCallback, useLayoutEffect, useMemo } from 'react'
+import { use, useCallback, useMemo } from 'react'
 import { FaCheckCircle, FaClock } from 'react-icons/fa'
 import { MdRemoveRedEye } from 'react-icons/md'
 import { RiResetLeftLine } from 'react-icons/ri'
@@ -9,7 +8,6 @@ import Cards from '~/components/Cards'
 import JoinRoomComponent from '~/components/JoinRoom'
 import PollResults from '~/components/PollResults'
 import Robot from '~/components/Robots'
-import { toaster } from '~/components/ui/toaster'
 import { RoomContext } from '~/contexts/room'
 import mapUsersToRobots, { type RobotType } from '~/mappers/usersToRobots'
 
@@ -18,22 +16,9 @@ const DEFAULT_POINTS = ['0.5', '1', '1.5', '2', '2.5', '3']
 export default function RoomPage() {
   const { room, resetVotes, isLoading, user, toggleRevealVotes } =
     use(RoomContext)
-  const router = useRouter()
   const users = Object.values(room?.users || {})
 
   const { firstHalf, secondHalf } = mapUsersToRobots(users)
-
-  useLayoutEffect(() => {
-    if (!room && !isLoading) {
-      router.push('/')
-      toaster.create({
-        title: 'Sala não encontrada',
-        description:
-          'A sala que você está tentando acessar não existe ou foi removida.',
-        type: 'error',
-      })
-    }
-  }, [room, isLoading, router])
 
   const hasPendingVotes = useMemo(
     () => users.some((user) => !user.vote),
@@ -123,6 +108,14 @@ export default function RoomPage() {
 
   if (room && !users?.some((roomuser) => roomuser.uid === user?.uid)) {
     return <JoinRoomComponent />
+  }
+
+  if (!room) {
+    return (
+      <Flex w='full' h='full' justify='center' align='center' bgColor='#F1F1F1'>
+        <Text fontSize='xl'>Sala não encontrada</Text>
+      </Flex>
+    )
   }
 
   return (
