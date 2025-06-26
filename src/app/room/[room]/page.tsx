@@ -1,25 +1,29 @@
 'use client'
 import { Button, Flex, HStack, Spinner, Stack, Text } from '@chakra-ui/react'
 import { useRouter } from 'next/navigation'
-import { use, useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useCallback, useLayoutEffect, useMemo } from 'react'
 import { FaCheckCircle, FaClock } from 'react-icons/fa'
 import { MdRemoveRedEye } from 'react-icons/md'
 import { RiResetLeftLine } from 'react-icons/ri'
 import Cards from '~/components/Cards'
 import JoinRoomComponent from '~/components/JoinRoom'
+import PollResults from '~/components/PollResults'
 import Robot from '~/components/Robots'
 import { toaster } from '~/components/ui/toaster'
 import { RoomContext } from '~/contexts/room'
 import mapUsersToRobots, { type RobotType } from '~/mappers/usersToRobots'
 
+const DEFAULT_POINTS = ['0.5', '1', '1.5', '2', '2.5', '3']
+
 export default function RoomPage() {
-  const { room, resetVotes, isLoading, user } = use(RoomContext)
+  const { room, resetVotes, isLoading, user, toggleRevealVotes } =
+    use(RoomContext)
   const router = useRouter()
-  const [revealVotes, setRevealVotes] = useState(false)
+  const users = Object.values(room?.users || {})
 
-  const { firstHalf, secondHalf } = mapUsersToRobots(room?.users || [])
+  const { firstHalf, secondHalf } = mapUsersToRobots(users)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!room && !isLoading) {
       router.push('/')
       toaster.create({
@@ -32,23 +36,31 @@ export default function RoomPage() {
   }, [room, isLoading, router])
 
   const hasPendingVotes = useMemo(
-    () => room?.users?.some((user) => !user.vote),
-    [room?.users],
+    () => users.some((user) => !user.vote),
+    [users],
   )
+
+  const hasVotes = useMemo(() => users.some((user) => user.vote), [users])
 
   const isRoomOwner = useMemo(
     () => room?.ownerUid === user?.uid,
     [room?.ownerUid, user?.uid],
   )
 
+  const points = useMemo(() => {
+    if (!room?.points) return DEFAULT_POINTS
+
+    return room.points.split(',').map((point) => point.trim())
+  }, [room])
+
   const buttonStyles = useMemo(
     () => ({
       borderColor: '#DD6B20',
       fontWeight: 600,
-      backgroundColor: revealVotes ? '#DD6B20' : 'transparent',
-      color: revealVotes ? 'white' : '#DD6B20',
+      backgroundColor: room?.revealVotes ? '#DD6B20' : 'transparent',
+      color: room?.revealVotes ? 'white' : '#DD6B20',
     }),
-    [revealVotes],
+    [room],
   )
 
   const createRobots = useCallback(
@@ -81,22 +93,21 @@ export default function RoomPage() {
                 avatar={robot.avatar}
                 name={robot.name}
                 vote={robot.vote}
-                revealVotes={revealVotes}
+                revealVotes={room?.revealVotes ?? false}
               />
             </Stack>
           ))}
         </HStack>
       )
     },
-    [revealVotes],
+    [room],
   )
 
-  function handleVotes() {
-    if (revealVotes) {
+  function handlePoll() {
+    if (room?.revealVotes) {
       resetVotes()
     }
-
-    setRevealVotes((prev) => !prev)
+    toggleRevealVotes(!room?.revealVotes)
   }
 
   if (isLoading) {
@@ -110,7 +121,7 @@ export default function RoomPage() {
     )
   }
 
-  if (!room?.users?.some((roomuser) => roomuser.uid === user?.uid)) {
+  if (room && !users?.some((roomuser) => roomuser.uid === user?.uid)) {
     return <JoinRoomComponent />
   }
 
@@ -129,7 +140,7 @@ export default function RoomPage() {
         minH={{ base: '20vh', '2xl': '30vh' }}
         direction='column'
         gap={8}
-        mt={{ base: 10, xl: 16, '2xl': 20 }}
+        mt={'3rem'}
       >
         {createRobots(firstHalf, true)}
 
@@ -148,28 +159,32 @@ export default function RoomPage() {
           direction='column'
         >
           <Text>
-            {hasPendingVotes ? 'Aguardando votos...' : 'Votação concluída!'}
+            {hasPendingVotes && !room?.revealVotes
+              ? 'Aguardando votos...'
+              : 'Votação concluída!'}
           </Text>
-          {isRoomOwner && (
+          {isRoomOwner && hasVotes && (
             <Button
               colorPalette='orange'
               variant='outline'
               size='md'
-              onClick={handleVotes}
+              onClick={handlePoll}
               style={buttonStyles}
             >
-              {revealVotes ? <RiResetLeftLine /> : <MdRemoveRedEye />}
-              {revealVotes ? 'Nova votação' : 'Revelar votos'}
+              {room?.revealVotes ? <RiResetLeftLine /> : <MdRemoveRedEye />}
+              {room?.revealVotes ? 'Nova votação' : 'Revelar votos'}
             </Button>
           )}
         </Flex>
 
         {createRobots(secondHalf, false)}
       </Flex>
-      <Cards
-        canVote={!revealVotes}
-        cards={['0.5', '1', '1.5', '2', '2.5', '3']}
-      />
+
+      {room?.revealVotes ? (
+        <PollResults users={users} />
+      ) : (
+        <Cards canVote={!room?.revealVotes} cards={points} />
+      )}
     </Flex>
   )
 }

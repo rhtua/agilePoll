@@ -22,12 +22,17 @@ export function useRoom() {
 
     const unsub = onValue(roomRef, (snapshot) => {
       const data = snapshot.val()
-      setRoom(data || null)
+
+      const mappedData: Room | null = {
+        ...data,
+        users: Object.values(data?.users || {}),
+      }
+      setRoom(mappedData || null)
       setIsLoading(false)
     })
 
     return () => unsub()
   }, [roomCode, ctx.database, room])
 
-  return { room, isLoading }
+  return { room, isLoading, setRoom }
 }

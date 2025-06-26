@@ -2,18 +2,27 @@
 import {
   Button,
   chakra,
+  createListCollection,
   Field,
   Flex,
   HStack,
   Input,
+  InputGroup,
+  Portal,
+  Select,
   Separator,
   Text,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/navigation'
 import { type FormEvent, use, useState } from 'react'
 import { withMask } from 'use-mask-input'
+import {
+  createSelectPointOptions,
+  SuggestedPoints,
+} from '~/constants/defaultPoints'
 import { RoomContext } from '~/contexts/room'
 import { toaster } from '../ui/toaster'
+import { InfoTip } from '../ui/toggle-tip'
 
 export function RoomForm() {
   const { createRoom, joinRoom } = use(RoomContext)
@@ -21,6 +30,11 @@ export function RoomForm() {
   const [loading, setLoading] = useState<'join' | 'create' | undefined>(
     undefined,
   )
+
+  const DEFAULT_POINTS = SuggestedPoints[0].points.join(' ,')
+
+  const [points, setPoints] = useState<string>(DEFAULT_POINTS)
+  const pointOptions = createSelectPointOptions()
 
   async function handleCreateRoom(ev: FormEvent<HTMLFormElement>) {
     ev.preventDefault()
@@ -64,7 +78,6 @@ export function RoomForm() {
       })
 
       setLoading(undefined)
-      console.log('returning from joinRoom')
       console.error('Error joining room:', e)
       return
     }
@@ -107,11 +120,49 @@ export function RoomForm() {
 
         <Field.Root required>
           <Field.Label>Pontuação</Field.Label>
-          <Input
-            name='points'
-            placeholder='0,1,1.5,2,2.5,3,4,5'
-            defaultValue={'0,1,1.5,2,2.5,3,4,5'}
-          />
+          <Select.Root
+            size={'md'}
+            defaultValue={[DEFAULT_POINTS]}
+            onValueChange={(e) => setPoints(e.value[0])}
+            collection={pointOptions}
+          >
+            <Select.HiddenSelect />
+            <Select.Control>
+              <Select.Trigger>
+                <Select.ValueText placeholder='Customizado' />
+              </Select.Trigger>
+              <Select.IndicatorGroup>
+                <Select.Indicator />
+              </Select.IndicatorGroup>
+            </Select.Control>
+            <Portal>
+              <Select.Positioner>
+                <Select.Content>
+                  {SuggestedPoints.map((i) => (
+                    <Select.Item item={i.points.join(' ,')} key={i.name}>
+                      {`${i.name} ${i.points.length > 0 ? `(${i.points.join(' ,')})` : ''}`}
+                      <Select.ItemIndicator />
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Positioner>
+            </Portal>
+          </Select.Root>
+          <InputGroup
+            endElement={
+              <InfoTip
+                content="A média sera calculada apenas se os pontos forem numéricos, exceto
+            '?' e '☕︎'.'"
+              />
+            }
+          >
+            <Input
+              name='points'
+              value={points}
+              onChange={(e) => setPoints(e.target.value)}
+              placeholder='0,1,1.5,2,2.5,3,4,5'
+            />
+          </InputGroup>
         </Field.Root>
 
         <Button

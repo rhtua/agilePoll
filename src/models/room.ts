@@ -8,7 +8,8 @@ export interface Room {
   code: string
   name: string
   points: string
-  createdAt: Date
+  revealVotes: boolean
+  createdAt: string | Date
   ownerUid: string
   users: User[]
 }

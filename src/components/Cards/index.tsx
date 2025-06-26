@@ -8,7 +8,7 @@ interface CardsProps {
   canVote: boolean
 }
 
-const CardsIcon = createIcon({
+export const CardsIcon = createIcon({
   displayName: 'CardsIcon',
   path: (
     <svg
@@ -56,7 +56,11 @@ export default function Cards({ cards, canVote }: CardsProps) {
           p={2}
           cursor='pointer'
           w={{ base: '100px', xl: '120px' }}
-          h={myVote === card ? '180px' : { base: '150px', xl: '160px' }}
+          h={
+            myVote === card
+              ? { base: '130px', xl: '180px' }
+              : { base: '150px', xl: '160px' }
+          }
           bgColor='#FBFBFB'
           borderTopRadius='lg'
           align='center'

@@ -13,8 +13,8 @@ export default function Robot({ avatar, name, vote, revealVotes }: RobotProps) {
     <Flex
       bgImage={`url(${avatar})`}
       bgSize={'100% 100%'}
-      w={{ base: '40px', xl: '56px' }}
-      h={{ base: '70px', xl: '86px' }}
+      h={'5rem'}
+      w={'3.3rem'}
       position='relative'
       borderRadius='lg'
     >
