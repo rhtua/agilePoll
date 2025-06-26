@@ -12,7 +12,7 @@ const urbanist = Urbanist({
 })
 
 export const metadata: Metadata = {
-  title: 'AgilePoll',
+  title: 'AgilePoll - Planning Poker',
   description: 'Planning Poker',
 }
 

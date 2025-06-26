@@ -40,7 +40,7 @@ export default function PageLayout({
     >
       <Flex w='full' h={'9vh'} px={10} py={2} shadow={room ? 'lg' : 'none'}>
         <Image
-          src='/icon.svg'
+          src='/agilePoll.png'
           alt='Logo'
           width={120}
           height={100}
