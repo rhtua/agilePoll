@@ -1,6 +1,7 @@
 import type { User } from '~/models/room'
 
-const ROBOT_AVATAR_URL = 'https://api.dicebear.com/9.x/bottts-neutral/png?seed='
+export const ROBOT_AVATAR_URL =
+  'https://api.dicebear.com/9.x/bottts-neutral/png?seed='
 
 export type RobotType = {
   avatar: string

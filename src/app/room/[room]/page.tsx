@@ -1,15 +1,14 @@
 'use client'
-import { Button, Flex, HStack, Spinner, Stack, Text } from '@chakra-ui/react'
-import { use, useCallback, useMemo } from 'react'
-import { FaCheckCircle, FaClock } from 'react-icons/fa'
+import { Button, Flex, Spinner, Text } from '@chakra-ui/react'
+import { use, useMemo } from 'react'
 import { MdRemoveRedEye } from 'react-icons/md'
 import { RiResetLeftLine } from 'react-icons/ri'
 import Cards from '~/components/Cards'
 import JoinRoomComponent from '~/components/JoinRoom'
 import PollResults from '~/components/PollResults'
-import Robot from '~/components/Robots'
 import { RoomContext } from '~/contexts/room'
-import mapUsersToRobots, { type RobotType } from '~/mappers/usersToRobots'
+import mapUsersToRobots from '~/mappers/usersToRobots'
+import { CreateMobileRobots, CreateRobots } from './createRobots'
 
 const DEFAULT_POINTS = ['0.5', '1', '1.5', '2', '2.5', '3']
 
@@ -45,46 +44,6 @@ export default function RoomPage() {
       backgroundColor: room?.revealVotes ? '#DD6B20' : 'transparent',
       color: room?.revealVotes ? 'white' : '#DD6B20',
     }),
-    [room],
-  )
-
-  const createRobots = useCallback(
-    (robots: RobotType[], isFirstRow: boolean) => {
-      if (!robots || robots.length === 0) return null
-
-      return (
-        <HStack
-          w={'full'}
-          justify={
-            robots.length % 2 === 0 && robots.length > 2
-              ? 'space-between'
-              : 'space-evenly'
-          }
-          gap={10}
-        >
-          {robots.map((robot) => (
-            <Stack
-              key={robot.avatar}
-              align={'center'}
-              gap={isFirstRow ? 2 : 5}
-              direction={isFirstRow ? 'column' : 'column-reverse'}
-            >
-              {robot.vote ? (
-                <FaCheckCircle color='green' />
-              ) : (
-                <FaClock color='gray' />
-              )}
-              <Robot
-                avatar={robot.avatar}
-                name={robot.name}
-                vote={robot.vote}
-                revealVotes={room?.revealVotes ?? false}
-              />
-            </Stack>
-          ))}
-        </HStack>
-      )
-    },
     [room],
   )
 
@@ -132,13 +91,26 @@ export default function RoomPage() {
         minW={'20vw'}
         minH={{ base: '20vh', '2xl': '30vh' }}
         direction='column'
+        align='center'
         gap={8}
         mt={'3rem'}
       >
-        {createRobots(firstHalf, true)}
+        <CreateRobots
+          robots={firstHalf}
+          isFirstRow={true}
+          revealVotes={room?.revealVotes}
+          display={{ base: 'none', sm: 'flex' }}
+        />
+
+        <CreateMobileRobots
+          robots={firstHalf}
+          isFirstRow={true}
+          revealVotes={room?.revealVotes}
+          display={{ base: 'flex', sm: 'none' }}
+        />
 
         <Flex
-          w='full'
+          w={{ base: '90%', sm: 'full' }}
           h='15vh'
           px={5}
           py={2}
@@ -170,13 +142,33 @@ export default function RoomPage() {
           )}
         </Flex>
 
-        {createRobots(secondHalf, false)}
+        <CreateRobots
+          robots={secondHalf}
+          isFirstRow={false}
+          revealVotes={room?.revealVotes}
+          display={{ base: 'none', sm: 'flex' }}
+        />
+
+        <CreateMobileRobots
+          robots={secondHalf}
+          isFirstRow={false}
+          revealVotes={room?.revealVotes}
+          display={{ base: 'flex', sm: 'none' }}
+        />
       </Flex>
 
       {room?.revealVotes ? (
         <PollResults users={users} />
       ) : (
-        <Cards canVote={!room?.revealVotes} cards={points} />
+        <Flex
+          w={'100vw'}
+          justifyContent={{ base: 'start', lg: 'center' }}
+          justify='center'
+          overflowX={'auto'}
+          overflowY={'hidden'}
+        >
+          <Cards canVote={!room?.revealVotes} cards={points} />
+        </Flex>
       )}
     </Flex>
   )

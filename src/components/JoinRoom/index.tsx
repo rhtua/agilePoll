@@ -45,18 +45,13 @@ export default function JoinRoomComponent() {
   )
 
   async function handleSubmit(ev: FormEvent<HTMLFormElement>) {
+    console.log('handleSubmit called')
     ev.preventDefault()
     const formData = new FormData(ev.currentTarget)
     const userName = formData.get('userName') as string
 
     await handleJoinRoom(room?.code || '', userName)
   }
-
-  useEffect(() => {
-    if (storedUserName && room?.code) {
-      handleJoinRoom(room.code || '', storedUserName)
-    }
-  }, [room?.code, storedUserName, handleJoinRoom])
 
   return (
     <Flex

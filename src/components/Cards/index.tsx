@@ -58,7 +58,7 @@ export default function Cards({ cards, canVote }: CardsProps) {
           w={{ base: '100px', xl: '120px' }}
           h={
             myVote === card
-              ? { base: '130px', xl: '180px' }
+              ? { base: '170px', xl: '180px' }
               : { base: '150px', xl: '160px' }
           }
           bgColor='#FBFBFB'

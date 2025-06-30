@@ -4,6 +4,7 @@ import PageLayout from '~/components/PageLayout'
 import { Provider } from '~/components/ui/provider'
 import { RoomProvider } from '~/contexts/room'
 import './global.css'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Toaster } from '~/components/ui/toaster'
 
 const urbanist = Urbanist({
@@ -24,6 +25,7 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning lang='en'>
       <body className={urbanist.className}>
+        <SpeedInsights />
         <Provider>
           <RoomProvider>
             <PageLayout>{children}</PageLayout>

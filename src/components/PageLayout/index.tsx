@@ -1,23 +1,26 @@
 'use client'
 import {
+  Avatar,
   Button,
   Flex,
   Group,
   HStack,
+  Image,
   Input,
   Menu,
   Popover,
   Portal,
   Spacer,
+  Spinner,
 } from '@chakra-ui/react'
-import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
-import { use } from 'react'
+import { use, useState } from 'react'
 import { AiOutlineUserAdd } from 'react-icons/ai'
 import { LiaUserAstronautSolid } from 'react-icons/lia'
 import { MdCopyAll, MdKeyboardArrowDown } from 'react-icons/md'
 import { TbLogout } from 'react-icons/tb'
 import { RoomContext } from '~/contexts/room'
+import { ROBOT_AVATAR_URL } from '~/mappers/usersToRobots'
 import { toaster } from '../ui/toaster'
 
 export default function PageLayout({
@@ -27,23 +30,30 @@ export default function PageLayout({
 }>) {
   const { room } = useParams()
   const { user, room: roomData, leaveRoom } = use(RoomContext)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const userName = roomData?.users?.find((u) => u.uid === user?.uid)?.name
   const router = useRouter()
 
   return (
     <Flex
       w={'100vw'}
       overflow={'hidden'}
-      h={'100vh'}
+      h={'100%'}
       align={'start'}
       justify={'start'}
       direction={'column'}
     >
-      <Flex w='full' h={'9vh'} px={10} py={2} shadow={room ? 'lg' : 'none'}>
+      <Flex
+        w='full'
+        h={'9vh'}
+        px={{ base: 4, md: 4, lg: 8, xl: 10 }}
+        py={2}
+        shadow={room ? 'lg' : 'none'}
+      >
         <Image
           src='/agilePoll.png'
           alt='Logo'
-          width={120}
-          height={100}
+          width={{ base: 24, md: 36 }}
           onClick={() => {
             router.push('/')
           }}
@@ -57,7 +67,7 @@ export default function PageLayout({
                 <Button
                   colorPalette='orange'
                   variant='outline'
-                  size='md'
+                  size={{ base: 'sm', md: 'md' }}
                   style={{
                     borderColor: '#DD6B20',
                     fontWeight: 600,
@@ -116,36 +126,61 @@ export default function PageLayout({
               </Portal>
             </Popover.Root>
 
-            <Menu.Root>
+            <Menu.Root open={isMenuOpen}>
               <Menu.Trigger asChild>
-                <Button
-                  colorPalette='orange'
-                  size='md'
-                  style={{
-                    backgroundColor: '#DD6B20',
-                    fontWeight: 600,
-                    color: 'white',
-                  }}
+                <Flex
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  cursor={'pointer'}
                 >
-                  <LiaUserAstronautSolid />{' '}
-                  {roomData?.users?.find((u) => u.uid === user?.uid)?.name ||
-                    'Usuário'}
-                  <MdKeyboardArrowDown />
-                </Button>
+                  <Avatar.Root
+                    shape='rounded'
+                    size='sm'
+                    display={{ base: 'flex', md: 'none' }}
+                  >
+                    <Avatar.Fallback>
+                      <Spinner />
+                    </Avatar.Fallback>
+                    <Avatar.Image
+                      src={user ? `${ROBOT_AVATAR_URL}${user.uid}` : undefined}
+                    />
+                  </Avatar.Root>
+                  <Button
+                    colorPalette='orange'
+                    display={{ base: 'none', md: 'flex' }}
+                    size='md'
+                    loading={
+                      roomData?.users?.find((u) => u.uid === user?.uid)
+                        ?.name === undefined
+                    }
+                    style={{
+                      backgroundColor: '#DD6B20',
+                      fontWeight: 600,
+                      color: 'white',
+                    }}
+                  >
+                    <LiaUserAstronautSolid /> {userName || ''}
+                    <MdKeyboardArrowDown />
+                  </Button>
+                </Flex>
               </Menu.Trigger>
               <Portal>
                 <Menu.Positioner>
                   <Menu.Content>
-                    <Menu.Item
-                      value='logout'
-                      onSelect={async () => {
-                        router.push('/')
-                        leaveRoom()
-                      }}
-                      justifyContent='center'
-                    >
-                      Sair <TbLogout />
-                    </Menu.Item>
+                    <Menu.ItemGroup>
+                      <Menu.ItemGroupLabel textAlign='center' mb={1}>
+                        {userName || ''}
+                      </Menu.ItemGroupLabel>
+                      <Menu.Item
+                        value='logout'
+                        onSelect={async () => {
+                          leaveRoom()
+                          setIsMenuOpen(false)
+                        }}
+                        justifyContent='center'
+                      >
+                        Sair <TbLogout />
+                      </Menu.Item>
+                    </Menu.ItemGroup>
                   </Menu.Content>
                 </Menu.Positioner>
               </Portal>

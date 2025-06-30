@@ -10,6 +10,7 @@ import {
   set,
   update,
 } from 'firebase/database'
+import { useRouter } from 'next/navigation'
 import { createContext, useCallback, useEffect } from 'react'
 import { firebaseConfig } from '~/config'
 import { generateRandomCode } from '~/helpers/randomCode'
@@ -51,6 +52,7 @@ export const RoomContext = createContext<{
 export function RoomProvider({ children }: { children: React.ReactNode }) {
   const { user } = useUser()
   const { room, isLoading, setRoom } = useRoom()
+  const router = useRouter()
 
   const createRoom = useCallback(
     async (name: string, username: string, points: string) => {
@@ -138,6 +140,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
     }
 
     await remove(userRef)
+    router.push('/')
     setRoom(null)
   }, [user, room, setRoom])
 

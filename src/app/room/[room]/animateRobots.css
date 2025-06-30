@@ -1,0 +1,25 @@
+.inner {
+  position: relative;
+  overflow: hidden;
+  height: 5rem;
+}
+
+.wrapper {
+  position: absolute;
+  display: flex;
+}
+
+.section {
+  animation: swipe var(--speed) linear infinite normal;
+  margin-right: 40px;
+}
+
+@keyframes swipe {
+  0% {
+    transform: translate(0);
+  }
+
+  100% {
+    transform: translate(calc(-100% - 40px));
+  }
+}
