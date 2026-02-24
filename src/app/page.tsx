@@ -1,4 +1,5 @@
 import { Flex, Stack, Text } from '@chakra-ui/react'
+import Image from 'next/image'
 import { RoomForm } from '~/components/RoomForm'
 
 export default function Home() {
@@ -8,16 +9,26 @@ export default function Home() {
       justify='center'
       w='full'
       h='full'
-      bgImage="url('/homeBg.png')"
-      bgSize='100% 100%'
-      bgRepeat='no-repeat'
+      position='relative'
+      overflow='hidden'
     >
-      <Stack align='center' mt={5}>
+      <Image
+        src='/homeBg.png'
+        alt='Background Image'
+        fill
+        sizes='100vw'
+        priority
+        style={{
+          objectFit: 'cover',
+          zIndex: -1,
+        }}
+      />
+      <Stack align='center' mt={5} zIndex={1}>
         <Text fontSize='4xl' fontWeight='bold' textAlign='start' w='full'>
           Planning Poker
         </Text>
         <Text
-          fontSize='lg  '
+          fontSize='lg'
           fontWeight='400'
           textAlign='start'
           w='full'

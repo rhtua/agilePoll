@@ -5,10 +5,11 @@ import {
   Flex,
   HStack,
   Input,
+  Spinner,
   Text,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/navigation'
-import { type FormEvent, use, useCallback, useEffect, useState } from 'react'
+import { type FormEvent, use, useCallback, useEffect, useRef, useState } from 'react'
 import { RoomContext } from '~/contexts/room'
 import { toaster } from '../ui/toaster'
 
@@ -16,8 +17,13 @@ export default function JoinRoomComponent() {
   const router = useRouter()
   const { room, joinRoom } = use(RoomContext)
   const [loading, setLoading] = useState(false)
+  const [autoJoining, setAutoJoining] = useState(false)
+  const autoJoinAttempted = useRef(false)
 
-  const storedUserName = sessionStorage.getItem(room?.code || '')
+  const storedUserName =
+    typeof window !== 'undefined'
+      ? sessionStorage.getItem(room?.code || '')
+      : ''
 
   const handleJoinRoom = useCallback(
     async (code: string, userName: string) => {
@@ -37,12 +43,22 @@ export default function JoinRoomComponent() {
         })
 
         setLoading(false)
+        setAutoJoining(false)
         console.error('Error joining room:', e)
         return
       }
     },
     [joinRoom, router.push],
   )
+
+  // Auto-join se já tiver username salvo no sessionStorage
+  useEffect(() => {
+    if (storedUserName && room?.code && !autoJoinAttempted.current) {
+      autoJoinAttempted.current = true
+      setAutoJoining(true)
+      handleJoinRoom(room.code, storedUserName)
+    }
+  }, [storedUserName, room?.code, handleJoinRoom])
 
   async function handleSubmit(ev: FormEvent<HTMLFormElement>) {
     console.log('handleSubmit called')
@@ -51,6 +67,17 @@ export default function JoinRoomComponent() {
     const userName = formData.get('userName') as string
 
     await handleJoinRoom(room?.code || '', userName)
+  }
+
+  if (autoJoining) {
+    return (
+      <Flex w='full' h='full' justify='center' align='center' bg='gray.100'>
+        <Flex direction='column' align='center' gap={4}>
+          <Spinner size='xl' color='orange.500' />
+          <Text fontSize='xl'>Entrando na sala...</Text>
+        </Flex>
+      </Flex>
+    )
   }
 
   return (

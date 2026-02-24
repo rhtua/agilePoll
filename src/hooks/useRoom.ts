@@ -5,21 +5,20 @@ import { toaster } from '~/components/ui/toaster'
 import { RoomContext } from '~/contexts/room'
 import type { Room } from '~/models/room'
 
-export function useRoom() {
+export function useRoom(database: import('firebase/database').Database | null) {
   const router = useRouter()
-  const ctx = useContext(RoomContext)
 
   const { room: roomCode } = useParams()
   const [room, setRoom] = useState<Room | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (!roomCode) {
+    if (!roomCode || !database) {
       setIsLoading(false)
       return
     }
     if (!room) setIsLoading(true)
-    const roomRef = ref(ctx.database, `rooms/${roomCode}`)
+    const roomRef = ref(database, `rooms/${roomCode}`)
 
     const unsub = onValue(roomRef, (snapshot) => {
       const data = snapshot.val()
@@ -46,7 +45,7 @@ export function useRoom() {
     })
 
     return () => unsub()
-  }, [roomCode, ctx.database, room, router.push])
+  }, [roomCode, database, room, router.push])
 
   return { room, isLoading, setRoom }
 }

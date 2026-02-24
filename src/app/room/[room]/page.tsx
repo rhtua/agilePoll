@@ -37,16 +37,6 @@ export default function RoomPage() {
     return room.points.split(',').map((point) => point.trim())
   }, [room])
 
-  const buttonStyles = useMemo(
-    () => ({
-      borderColor: '#DD6B20',
-      fontWeight: 600,
-      backgroundColor: room?.revealVotes ? '#DD6B20' : 'transparent',
-      color: room?.revealVotes ? 'white' : '#DD6B20',
-    }),
-    [room],
-  )
-
   function handlePoll() {
     if (room?.revealVotes) {
       resetVotes()
@@ -56,7 +46,7 @@ export default function RoomPage() {
 
   if (isLoading) {
     return (
-      <Flex w='full' h='full' justify='center' align='center' bgColor='#F1F1F1'>
+      <Flex w='full' h='full' justify='center' align='center' bg='gray.100'>
         <Flex direction='column' align='center' gap={4}>
           <Spinner size='xl' color='orange.500' />
           <Text fontSize='xl'>Carregando...</Text>
@@ -71,7 +61,7 @@ export default function RoomPage() {
 
   if (!room) {
     return (
-      <Flex w='full' h='full' justify='center' align='center' bgColor='#F1F1F1'>
+      <Flex w='full' h='full' justify='center' align='center' bg='gray.100'>
         <Text fontSize='xl'>Sala não encontrada</Text>
       </Flex>
     )
@@ -83,7 +73,7 @@ export default function RoomPage() {
       h='full'
       justify='space-between'
       align='center'
-      bgColor='#F1F1F1'
+      bg='gray.100'
       direction='column'
     >
       {/* Table */}
@@ -115,11 +105,11 @@ export default function RoomPage() {
           px={5}
           py={2}
           gap={2}
-          bgColor={'#FBFBFB'}
+          bg='gray.50'
           borderRadius='lg'
           align={'center'}
           justify={'center'}
-          borderColor={'#C0C0C0'}
+          borderColor='gray.400'
           borderWidth={4}
           direction='column'
         >
@@ -134,7 +124,10 @@ export default function RoomPage() {
               variant='outline'
               size='md'
               onClick={handlePoll}
-              style={buttonStyles}
+              borderColor='orange.500'
+              fontWeight='600'
+              bg={room?.revealVotes ? 'orange.500' : 'transparent'}
+              color={room?.revealVotes ? 'white' : 'orange.500'}
             >
               {room?.revealVotes ? <RiResetLeftLine /> : <MdRemoveRedEye />}
               {room?.revealVotes ? 'Nova votação' : 'Revelar votos'}

@@ -93,6 +93,33 @@ export default function PollResults({ users }: CardsProps) {
           </Text>
         </Stack>
       )}
+
+      {/* Distribuição de Votos */}
+      <Stack align='flex-start' ml={{ base: 0, sm: 8 }} mt={{ base: 4, sm: 0 }} justify='center' minW='200px'>
+        <Text fontWeight={600} fontSize={18} mb={2}>
+          Votos:
+        </Text>
+        <Stack gap={2} w='full'>
+          {Object.entries(ranking)
+            .sort((a, b) => b[1] - a[1])
+            .map(([voteStr, count]) => {
+              const widthPerc = Math.round((count / totalVotes) * 100)
+              return (
+                <Flex key={voteStr} align='center' gap={3} w='full'>
+                  <Text fontWeight={700} w='30px' textAlign='right'>
+                    {voteStr}
+                  </Text>
+                  <Flex bg='orange.100' h='12px' borderRadius='full' flex={1} maxW='150px' overflow='hidden'>
+                    <Flex bg='orange.500' h='full' borderRadius='full' w={`${widthPerc}%`} transition='width 0.5s' />
+                  </Flex>
+                  <Text fontSize={12} color='gray.600' w='50px'>
+                    {count} {count === 1 ? 'voto' : 'votos'}
+                  </Text>
+                </Flex>
+              )
+            })}
+        </Stack>
+      </Stack>
     </Flex>
   )
 }

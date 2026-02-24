@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Urbanist } from 'next/font/google'
 import PageLayout from '~/components/PageLayout'
 import { Provider } from '~/components/ui/provider'
-import { RoomProvider } from '~/contexts/room'
+import ClientRoomProvider from '~/components/ClientRoomProvider'
 import './global.css'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Toaster } from '~/components/ui/toaster'
@@ -27,9 +27,9 @@ export default function RootLayout({
       <body className={urbanist.className}>
         <SpeedInsights />
         <Provider>
-          <RoomProvider>
+          <ClientRoomProvider>
             <PageLayout>{children}</PageLayout>
-          </RoomProvider>
+          </ClientRoomProvider>
           <Toaster />
         </Provider>
       </body>

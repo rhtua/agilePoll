@@ -1,4 +1,9 @@
-import { getAuth, signInAnonymously, type User } from 'firebase/auth'
+import {
+  getAuth,
+  signInAnonymously,
+  updateProfile,
+  type User,
+} from 'firebase/auth'
 import { useEffect, useState } from 'react'
 
 export function useUser() {
@@ -9,7 +14,7 @@ export function useUser() {
     signInAnonymously(auth).then((user) => {
       setUser(user.user)
     })
-  })
+  }, [])
 
   useEffect(() => {
     const auth = getAuth()
@@ -19,5 +24,13 @@ export function useUser() {
     return () => unsub()
   }, [])
 
-  return { user }
+  const updateUserProfile = async (displayName: string) => {
+    const auth = getAuth()
+    if (auth.currentUser) {
+      await updateProfile(auth.currentUser, { displayName })
+      setUser({ ...auth.currentUser }) // Force re-render
+    }
+  }
+
+  return { user, updateUserProfile }
 }

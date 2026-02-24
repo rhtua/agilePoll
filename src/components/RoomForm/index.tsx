@@ -61,27 +61,12 @@ export function RoomForm() {
     ev.preventDefault()
     const formData = new FormData(ev.currentTarget)
     const code = formData.get('code') as string
-    const userName = formData.get('userName') as string
 
-    if (!userName || !code) {
+    if (!code) {
       return
     }
 
-    try {
-      setLoading('join')
-      await joinRoom(code, userName)
-    } catch (e) {
-      toaster.create({
-        title: 'Erro ao entrar na sala',
-        description: 'Verifique o código e tente novamente.',
-        type: 'error',
-      })
-
-      setLoading(undefined)
-      console.error('Error joining room:', e)
-      return
-    }
-
+    setLoading('join')
     router.push(`/room/${code}`)
   }
 
@@ -169,14 +154,12 @@ export function RoomForm() {
           w='fit'
           mx='auto'
           colorPalette='orange'
+          bg='orange.500'
+          color='white'
+          fontWeight='600'
+          fontSize='md'
           px={10}
           size='md'
-          style={{
-            backgroundColor: '#DD6B20',
-            fontWeight: 600,
-            fontSize: 16,
-            color: 'white',
-          }}
           loading={loading === 'create'}
           disabled={loading === 'join'}
           type='submit'
@@ -196,12 +179,7 @@ export function RoomForm() {
         gap={3}
         onSubmit={handleJoinRoom}
       >
-        <HStack w='full'>
-          <Field.Root required>
-            <Field.Label>Seu nome</Field.Label>
-            <Input name='userName' placeholder='Digite o seu nome' />
-          </Field.Root>
-          <Field.Root required>
+          <Field.Root required w='full'>
             <Field.Label>Código da sala</Field.Label>
             <Input
               name='code'
@@ -209,20 +187,17 @@ export function RoomForm() {
               placeholder='AAAA-BBBB'
             />
           </Field.Root>
-        </HStack>
         <Button
           w='fit'
           mx='auto'
           px={7}
           colorPalette='orange'
           variant='outline'
+          borderColor='orange.500'
+          color='orange.500'
+          fontWeight='600'
+          fontSize='md'
           size='md'
-          style={{
-            borderColor: '#DD6B20',
-            fontWeight: 600,
-            fontSize: 16,
-            color: '#DD6B20',
-          }}
           loading={loading === 'join'}
           disabled={loading === 'create'}
           type='submit'
