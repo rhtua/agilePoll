@@ -1,8 +1,7 @@
 import { onValue, ref } from 'firebase/database'
 import { useParams, useRouter } from 'next/navigation'
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toaster } from '~/components/ui/toaster'
-import { RoomContext } from '~/contexts/room'
 import type { Room } from '~/models/room'
 
 export function useRoom(database: import('firebase/database').Database | null) {
@@ -17,7 +16,7 @@ export function useRoom(database: import('firebase/database').Database | null) {
       setIsLoading(false)
       return
     }
-    if (!room) setIsLoading(true)
+    setIsLoading(true)
     const roomRef = ref(database, `rooms/${roomCode}`)
 
     const unsub = onValue(roomRef, (snapshot) => {
@@ -45,7 +44,7 @@ export function useRoom(database: import('firebase/database').Database | null) {
     })
 
     return () => unsub()
-  }, [roomCode, database, room, router.push])
+  }, [roomCode, database, router.push])
 
   return { room, isLoading, setRoom }
 }

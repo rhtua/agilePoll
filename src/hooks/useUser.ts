@@ -3,8 +3,8 @@ import {
   getAuth,
   setPersistence,
   signInAnonymously,
-  updateProfile,
   type User,
+  updateProfile,
 } from 'firebase/auth'
 import { useEffect, useState } from 'react'
 
@@ -13,19 +13,28 @@ export function useUser() {
 
   useEffect(() => {
     const auth = getAuth()
-    setPersistence(auth, browserSessionPersistence).then(() =>
-      signInAnonymously(auth).then((user) => {
-        setUser(user.user)
-      }),
-    )
-  }, [])
+    let cancelled = false
 
-  useEffect(() => {
-    const auth = getAuth()
+    const unsub = auth.onAuthStateChanged(async (firebaseUser) => {
+      if (cancelled) return
 
-    const unsub = auth.onAuthStateChanged((user) => setUser(user ?? null))
+      if (firebaseUser) {
+        setUser(firebaseUser)
+      } else {
+        try {
+          await setPersistence(auth, browserSessionPersistence)
+          const cred = await signInAnonymously(auth)
+          if (!cancelled) setUser(cred.user)
+        } catch (e) {
+          console.error('Failed to sign in anonymously:', e)
+        }
+      }
+    })
 
-    return () => unsub()
+    return () => {
+      cancelled = true
+      unsub()
+    }
   }, [])
 
   const updateUserProfile = async (displayName: string) => {

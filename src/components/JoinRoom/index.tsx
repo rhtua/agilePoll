@@ -1,3 +1,4 @@
+'use client'
 import {
   Button,
   chakra,
@@ -9,7 +10,14 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/navigation'
-import { type FormEvent, use, useCallback, useEffect, useRef, useState } from 'react'
+import {
+  type FormEvent,
+  use,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 import { RoomContext } from '~/contexts/room'
 import { toaster } from '../ui/toaster'
 

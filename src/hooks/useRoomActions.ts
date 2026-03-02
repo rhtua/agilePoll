@@ -1,5 +1,5 @@
 import type { User } from 'firebase/auth'
-import { get, ref, remove, set, update, type Database } from 'firebase/database'
+import { type Database, get, ref, remove, set, update } from 'firebase/database'
 import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
 import { generateRandomCode } from '~/helpers/randomCode'
@@ -59,6 +59,10 @@ export function useRoomActions(
         throw new Error('User must be authenticated to join a room')
       }
 
+      if (!/^[A-Za-z]{4}-[A-Za-z]{4}$/.test(code)) {
+        throw new Error('Código de sala inválido')
+      }
+
       const roomRef = ref(database, `rooms/${code}`)
 
       const snapshot = await get(roomRef)
@@ -116,13 +120,10 @@ export function useRoomActions(
 
   const vote = useCallback(
     async (voteValue: string) => {
-      console.log('Vote action called with:', voteValue, { user, room })
       if (!user) {
-        console.error('User must be authenticated to vote')
         throw new Error('User must be authenticated to vote')
       }
       if (!room) {
-        console.error('Room not found')
         throw new Error('Room not found')
       }
 
@@ -130,15 +131,11 @@ export function useRoomActions(
 
       try {
         const snapshot = await get(userRef)
-        const prevUser = snapshot.val()
-        console.log('PrevUser fetched:', prevUser)
-        if (!prevUser) {
-          console.error('User does not exist in room')
-          throw new Error('User does not exist')
+        if (!snapshot.exists()) {
+          throw new Error('User does not exist in room')
         }
 
-        await update(userRef, { ...prevUser, vote: voteValue })
-        console.log('Vote updated successfully')
+        await update(userRef, { vote: voteValue })
       } catch (e) {
         console.error('Failed to update vote in Firebase:', e)
       }

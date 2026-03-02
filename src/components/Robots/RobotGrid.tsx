@@ -76,7 +76,7 @@ export function CreateMobileRobots({
     <Flex
       w={{ base: !robotsEnoughForScroll ? 'full' : '100vw', md: 'full' }}
       h='full'
-      minH={'6rem'}
+      minH={'8rem'}
       justify='center'
       className='inner'
       {...rest}

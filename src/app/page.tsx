@@ -13,10 +13,8 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { useState } from 'react'
-import { FaUsers, FaBolt, FaChartBar, FaArrowRight } from 'react-icons/fa'
-import { RoomForm } from '~/components/RoomForm'
-
-const HERO_CARDS = ['0.5', '1', '1.5', '2', '2.5', '3']
+import { FaArrowRight, FaBolt, FaChartBar, FaUsers } from 'react-icons/fa'
+import { CreateRoomForm, JoinRoomForm } from '~/components/RoomForm'
 
 const FEATURES = [
   {
@@ -31,7 +29,8 @@ const FEATURES = [
     title: 'Rápido e simples',
     description:
       'Crie uma sala em segundos, compartilhe o código e comece a votar imediatamente.',
-    gradient: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))',
+    gradient:
+      'linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))',
   },
   {
     icon: FaChartBar,
@@ -43,7 +42,8 @@ const FEATURES = [
 ]
 
 export default function Home() {
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false)
 
   return (
     <Flex
@@ -51,7 +51,7 @@ export default function Home() {
       w='full'
       minH='100vh'
       className='landing-bg'
-      overflow='hidden'
+      overflowY='auto'
     >
       {/* ─── Hero ─── */}
       <Flex
@@ -71,6 +71,7 @@ export default function Home() {
           flex={1}
           gap={6}
           className='animate-fade-in-up'
+          overflowX='hidden'
         >
           <Heading
             as='h1'
@@ -78,6 +79,7 @@ export default function Home() {
             fontWeight='800'
             color='var(--color-text)'
             lineHeight='1.1'
+            textAlign={{ base: 'center', md: 'start' }}
           >
             Planning Poker
             <Text
@@ -85,7 +87,8 @@ export default function Home() {
               display='block'
               mt={2}
               style={{
-                background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
+                background:
+                  'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}
@@ -102,25 +105,33 @@ export default function Home() {
             Estime suas tarefas de forma colaborativa com sua equipe ágil.
             Rápido, simples e eficiente.
           </Text>
-          <HStack gap={4} flexWrap='wrap'>
+          <HStack
+            gap={4}
+            px={{ base: 0, md: 2 }}
+            py={{ base: 2, md: 4 }}
+            flexWrap='wrap'
+            justifyContent={{ base: 'center', md: 'start' }}
+          >
             <Button
               size='lg'
               px={8}
               py={6}
               fontWeight='700'
               fontSize='lg'
+              zIndex={10}
               style={{
-                background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))',
+                background:
+                  'linear-gradient(135deg, var(--color-accent-hover), var(--color-primary))',
                 color: 'white',
                 borderRadius: '12px',
-                boxShadow: '0 4px 14px rgba(234, 88, 12, 0.35)',
+                boxShadow: '0 4px 14px rgba(234, 90, 12, 0.93)',
               }}
               _hover={{
                 transform: 'translateY(-2px)',
-                boxShadow: '0 8px 24px rgba(234, 88, 12, 0.4)',
+                boxShadow: '0 8px 24px rgba(234, 90, 12, 0.75)',
               }}
               transition='all 0.2s ease'
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => setIsCreateModalOpen(true)}
             >
               Criar sala grátis
               <FaArrowRight />
@@ -142,7 +153,7 @@ export default function Home() {
                 bg: 'var(--color-primary-light)',
               }}
               transition='all 0.2s ease'
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => setIsJoinModalOpen(true)}
             >
               Entrar em uma sala
             </Button>
@@ -158,88 +169,21 @@ export default function Home() {
           <Box
             bg='white'
             borderRadius='2xl'
-            p={{ base: 5, md: 8 }}
+            p='2px'
+            pt={{ base: 2, md: 4 }}
             w='full'
             maxW='450px'
             boxShadow='0 20px 60px rgba(0,0,0,0.08), 0 0 0 1px var(--color-border)'
           >
             {/* Window dots */}
-            <HStack gap={2} mb={6}>
+            <HStack gap={2} mb={6} ml={2}>
               <Box w='10px' h='10px' borderRadius='full' bg='#EF4444' />
               <Box w='10px' h='10px' borderRadius='full' bg='#F59E0B' />
               <Box w='10px' h='10px' borderRadius='full' bg='#22C55E' />
             </HStack>
 
-            {/* Cards preview */}
-            <HStack justify='center' gap={2} mb={6}>
-              {HERO_CARDS.map((value, i) => (
-                <Box
-                  key={value}
-                  h={{ base: '60px', md: '72px' }}
-                  w={{ base: '40px', md: '48px' }}
-                  borderRadius='lg'
-                  display='flex'
-                  alignItems='center'
-                  justifyContent='center'
-                  fontWeight='800'
-                  fontSize={{ base: 'md', md: 'lg' }}
-                  boxShadow={
-                    i === 3
-                      ? '0 4px 16px var(--color-accent-glow)'
-                      : '0 2px 6px rgba(0,0,0,0.06)'
-                  }
-                  style={{
-                    background:
-                      i === 3
-                        ? 'linear-gradient(135deg, var(--color-primary), var(--color-accent))'
-                        : 'linear-gradient(180deg, #F8FAFC, #F1F5F9)',
-                    color: i === 3 ? 'white' : 'var(--color-card-text)',
-                    transform: i === 3 ? 'scale(1.1)' : 'scale(1)',
-                    animation: `card-stagger 0.5s ease-out ${0.3 + i * 0.08}s both`,
-                  }}
-                >
-                  {value}
-                </Box>
-              ))}
-            </HStack>
-
-            {/* Result preview */}
-            <Box
-              bg='var(--color-surface-dim)'
-              borderRadius='lg'
-              p={4}
-              textAlign='center'
-            >
-              <Text fontSize='sm' color='var(--color-text-muted)' mb={1}>
-                4 de 4 participantes votaram
-              </Text>
-              <HStack justify='center' gap={6}>
-                <Stack gap={0} align='center'>
-                  <Text fontSize='xs' color='var(--color-text-muted)'>
-                    Média
-                  </Text>
-                  <Text fontSize='2xl' fontWeight='800' color='var(--color-text)'>
-                    2.1
-                  </Text>
-                </Stack>
-                <Stack gap={0} align='center'>
-                  <Text fontSize='xs' color='var(--color-text-muted)'>
-                    Sugestão
-                  </Text>
-                  <Text
-                    fontSize='2xl'
-                    fontWeight='800'
-                    style={{
-                      background: 'linear-gradient(135deg, var(--color-primary), var(--color-accent))',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                    }}
-                  >
-                    2
-                  </Text>
-                </Stack>
-              </HStack>
-            </Box>
+            {/* App image demo */}
+            <Image src='/demo.webp' alt='Demo' borderRadius='xl' />
           </Box>
         </Flex>
       </Flex>
@@ -261,7 +205,19 @@ export default function Home() {
           color='var(--color-text)'
           mb={{ base: 8, md: 16 }}
         >
-          Por que usar o AgilePoll?
+          Por que usar o Agile
+          <Text
+            as='span'
+            fontWeight='700'
+            style={{
+              background: 'linear-gradient(135deg, #F59E0B, #EA580C)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            Poll
+          </Text>
+          ?
         </Heading>
 
         <SimpleGrid columns={{ base: 1, md: 3 }} gap={8}>
@@ -275,7 +231,8 @@ export default function Home() {
               transition='all 0.3s ease'
               _hover={{
                 transform: 'translateY(-4px)',
-                boxShadow: '0 12px 32px rgba(0,0,0,0.08), 0 0 0 1px var(--color-border)',
+                boxShadow:
+                  '0 12px 32px rgba(0,0,0,0.08), 0 0 0 1px var(--color-border)',
               }}
               style={{
                 animation: `fade-in-up 0.5s ease-out ${0.1 + i * 0.1}s both`,
@@ -302,10 +259,7 @@ export default function Home() {
               >
                 {feature.title}
               </Text>
-              <Text
-                color='var(--color-text-secondary)'
-                lineHeight='1.7'
-              >
+              <Text color='var(--color-text-secondary)' lineHeight='1.7'>
                 {feature.description}
               </Text>
             </Box>
@@ -327,7 +281,8 @@ export default function Home() {
           p={{ base: 8, md: 12 }}
           textAlign='center'
           style={{
-            background: 'linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))',
+            background:
+              'linear-gradient(135deg, var(--color-primary), var(--color-primary-hover))',
             boxShadow: '0 20px 60px rgba(234, 88, 12, 0.25)',
           }}
         >
@@ -363,7 +318,7 @@ export default function Home() {
               bg: 'gray.100',
             }}
             transition='all 0.2s ease'
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => setIsCreateModalOpen(true)}
           >
             Criar sala agora
             <FaArrowRight />
@@ -372,11 +327,7 @@ export default function Home() {
       </Box>
 
       {/* ─── Footer ─── */}
-      <Box
-        as='footer'
-        borderTop='1px solid var(--color-border)'
-        mt='auto'
-      >
+      <Box as='footer' borderTop='1px solid var(--color-border)' mt='auto'>
         <Flex
           maxW='1200px'
           mx='auto'
@@ -416,45 +367,69 @@ export default function Home() {
             </Text>
           </HStack>
           <Text color='var(--color-text-muted)' fontSize='sm'>
-            © 2026 AgilePoll. Facilitando estimativas ágeis.
+            © {new Date().getFullYear()} AgilePoll. Facilitando estimativas
+            ágeis.
           </Text>
         </Flex>
       </Box>
 
-      {/* ─── Room Form Modal ─── */}
+      {/* ─── Create Room Modal ─── */}
       <Dialog.Root
-        open={isModalOpen}
-        onOpenChange={(e) => setIsModalOpen(e.open)}
+        open={isCreateModalOpen}
+        onOpenChange={(e) => setIsCreateModalOpen(e.open)}
         placement='center'
-        size='lg'
+        size='md'
       >
         <Portal>
           <Dialog.Backdrop />
           <Dialog.Positioner>
-            <Dialog.Content
-              borderRadius='xl'
-              p={0}
-              overflow='hidden'
-            >
+            <Dialog.Content borderRadius='xl' p={0} overflow='hidden'>
               <Dialog.Header
                 px={6}
                 py={4}
                 borderBottom='1px solid var(--color-border)'
               >
                 <Dialog.Title fontWeight='700' fontSize='lg'>
-                  Criar ou entrar em uma sala
+                  Criar uma sala
                 </Dialog.Title>
               </Dialog.Header>
-              <Dialog.Body px={0} py={0}>
-                <Flex justify='center' py={6}>
-                  <RoomForm />
+              <Dialog.Body px={6} py={6}>
+                <Flex direction='column' align='center' gap={3}>
+                  <CreateRoomForm />
                 </Flex>
               </Dialog.Body>
-              <Dialog.CloseTrigger
-                position='absolute'
-                top={3}
-                right={3}
-              />
+              <Dialog.CloseTrigger position='absolute' top={3} right={3} />
+            </Dialog.Content>
+          </Dialog.Positioner>
+        </Portal>
+      </Dialog.Root>
+
+      {/* ─── Join Room Modal ─── */}
+      <Dialog.Root
+        open={isJoinModalOpen}
+        onOpenChange={(e) => setIsJoinModalOpen(e.open)}
+        placement='center'
+        size='sm'
+      >
+        <Portal>
+          <Dialog.Backdrop />
+          <Dialog.Positioner>
+            <Dialog.Content borderRadius='xl' p={0} overflow='hidden'>
+              <Dialog.Header
+                px={6}
+                py={4}
+                borderBottom='1px solid var(--color-border)'
+              >
+                <Dialog.Title fontWeight='700' fontSize='lg'>
+                  Entrar em uma sala
+                </Dialog.Title>
+              </Dialog.Header>
+              <Dialog.Body px={6} py={6}>
+                <Flex direction='column' align='center' gap={3}>
+                  <JoinRoomForm />
+                </Flex>
+              </Dialog.Body>
+              <Dialog.CloseTrigger position='absolute' top={3} right={3} />
             </Dialog.Content>
           </Dialog.Positioner>
         </Portal>

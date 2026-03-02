@@ -2,9 +2,8 @@
 import { Button, Flex, Text } from '@chakra-ui/react'
 import { MdRemoveRedEye } from 'react-icons/md'
 import { RiResetLeftLine } from 'react-icons/ri'
-import { TbArrowsTransferDown } from 'react-icons/tb'
-import { CreateMobileRobots, CreateRobots } from '~/components/Robots/RobotGrid'
 import type { RobotType } from '~/mappers/usersToRobots'
+import { CreateMobileRobots, CreateRobots } from '../Robots/RobotGrid'
 
 interface VotingTableProps {
   firstHalf: RobotType[]
@@ -13,9 +12,7 @@ interface VotingTableProps {
   hasPendingVotes: boolean
   hasVotes: boolean
   isRoomOwner: boolean
-  hasOtherUsers: boolean
   onPoll: () => void
-  onTransferOpen: () => void
 }
 
 export default function VotingTable({
@@ -25,9 +22,7 @@ export default function VotingTable({
   hasPendingVotes,
   hasVotes,
   isRoomOwner,
-  hasOtherUsers,
   onPoll,
-  onTransferOpen,
 }: VotingTableProps) {
   return (
     <Flex
@@ -36,7 +31,7 @@ export default function VotingTable({
       direction='column'
       align='center'
       gap={8}
-      mt={'3rem'}
+      mt={{ base: '1rem', md: '2rem', xl: '3rem' }}
     >
       <CreateRobots
         robots={firstHalf}
@@ -85,7 +80,7 @@ export default function VotingTable({
           <Button
             colorPalette='orange'
             variant='outline'
-            size='md'
+            size={{ base: 'xs', md: 'sm', xl: 'md' }}
             onClick={onPoll}
             style={{
               borderColor: 'var(--color-primary)',
@@ -96,23 +91,6 @@ export default function VotingTable({
           >
             {revealVotes ? <RiResetLeftLine /> : <MdRemoveRedEye />}
             {revealVotes ? 'Nova votação' : 'Revelar votos'}
-          </Button>
-        )}
-        {isRoomOwner && hasOtherUsers && (
-          <Button
-            variant='ghost'
-            size='sm'
-            onClick={onTransferOpen}
-            color='var(--color-text-muted)'
-            fontWeight='500'
-            fontSize='sm'
-            _hover={{
-              color: 'var(--color-text-secondary)',
-              bg: 'var(--color-surface-dimmer)',
-            }}
-          >
-            <TbArrowsTransferDown />
-            Transferir sala
           </Button>
         )}
       </Flex>

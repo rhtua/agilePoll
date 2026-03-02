@@ -10,6 +10,20 @@ interface CardsProps {
 export default function PollResults({ users }: CardsProps) {
   const votes = users.map((user) => user.vote).filter((v) => Boolean(v))
 
+  if (votes.length === 0) {
+    return (
+      <Flex align='center' pb={4} className='animate-slide-up'>
+        <Text
+          fontSize={16}
+          color='var(--color-text-secondary)'
+          fontWeight={500}
+        >
+          Nenhum voto registrado
+        </Text>
+      </Flex>
+    )
+  }
+
   const validVotes = votes.filter((vote) => !Number.isNaN(parseFloat(vote!)))
 
   const totalVotes = validVotes.length
@@ -32,7 +46,12 @@ export default function PollResults({ users }: CardsProps) {
   )
 
   return (
-    <Flex align='top' pb={4} gap={8} className='animate-slide-up'>
+    <Flex
+      align='top'
+      pb={4}
+      gap={{ base: 3, md: 8 }}
+      className='animate-slide-up'
+    >
       <Stack align='center'>
         <Text fontWeight={600} fontSize={18}>
           Sugestão:
@@ -103,7 +122,7 @@ export default function PollResults({ users }: CardsProps) {
             Média:
           </Text>
           <Text
-            fontSize={48}
+            fontSize={{ base: 30, md: 48 }}
             textAlign='center'
             fontWeight={800}
             alignContent='center'
@@ -141,7 +160,7 @@ export default function PollResults({ users }: CardsProps) {
                     h='12px'
                     borderRadius='full'
                     flex={1}
-                    maxW='150px'
+                    maxW={{ base: '100px', md: '150px' }}
                     overflow='hidden'
                   >
                     <Flex

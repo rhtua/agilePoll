@@ -1,10 +1,9 @@
 'use client'
 import { Flex, Spinner, Text } from '@chakra-ui/react'
-import { use, useMemo, useState } from 'react'
+import { use, useMemo } from 'react'
 import Cards from '~/components/Cards'
 import JoinRoomComponent from '~/components/JoinRoom'
 import PollResults from '~/components/PollResults'
-import TransferDialog from '~/components/TransferDialog'
 import VotingTable from '~/components/VotingTable'
 import { RoomContext } from '~/contexts/room'
 import mapUsersToRobots from '~/mappers/usersToRobots'
@@ -12,19 +11,12 @@ import mapUsersToRobots from '~/mappers/usersToRobots'
 const DEFAULT_POINTS = ['0.5', '1', '1.5', '2', '2.5', '3']
 
 export default function RoomPage() {
-  const {
-    room,
-    resetVotes,
-    isLoading,
-    user,
-    toggleRevealVotes,
-    transferOwnership,
-  } = use(RoomContext)
+  const { room, resetVotes, isLoading, user, toggleRevealVotes } =
+    use(RoomContext)
   const allUsers = Object.values(room?.users || {})
   const users = allUsers.filter(
     (u) => u.online !== false || u.uid === user?.uid,
   )
-  const [isTransferOpen, setIsTransferOpen] = useState(false)
 
   const { firstHalf, secondHalf } = mapUsersToRobots(users)
 
@@ -38,11 +30,6 @@ export default function RoomPage() {
   const isRoomOwner = useMemo(
     () => room?.ownerUid === user?.uid,
     [room?.ownerUid, user?.uid],
-  )
-
-  const otherUsers = useMemo(
-    () => users.filter((u) => u.uid !== user?.uid),
-    [users, user?.uid],
   )
 
   const points = useMemo(() => {
@@ -62,7 +49,7 @@ export default function RoomPage() {
     return (
       <Flex
         w='full'
-        h='full'
+        flex={1}
         justify='center'
         align='center'
         className='room-bg'
@@ -85,7 +72,7 @@ export default function RoomPage() {
     return (
       <Flex
         w='full'
-        h='full'
+        flex={1}
         justify='center'
         align='center'
         className='room-bg'
@@ -100,7 +87,7 @@ export default function RoomPage() {
   return (
     <Flex
       w='full'
-      h='full'
+      flex={1}
       justify='space-between'
       align='center'
       className='room-bg'
@@ -113,9 +100,7 @@ export default function RoomPage() {
         hasPendingVotes={hasPendingVotes}
         hasVotes={hasVotes}
         isRoomOwner={isRoomOwner}
-        hasOtherUsers={otherUsers.length > 0}
         onPoll={handlePoll}
-        onTransferOpen={() => setIsTransferOpen(true)}
       />
 
       {room?.revealVotes ? (
@@ -131,13 +116,6 @@ export default function RoomPage() {
           <Cards canVote={!room?.revealVotes} cards={points} />
         </Flex>
       )}
-
-      <TransferDialog
-        isOpen={isTransferOpen}
-        onClose={() => setIsTransferOpen(false)}
-        otherUsers={otherUsers}
-        onTransfer={transferOwnership}
-      />
     </Flex>
   )
 }
