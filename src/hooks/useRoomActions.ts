@@ -36,11 +36,13 @@ export function useRoomActions(
             uid: user.uid,
             name: username,
             vote: '',
+            online: true,
           },
         },
       }
 
       await set(ref(database, `rooms/${code}`), newRoom)
+
       setRoom({
         ...newRoom,
         users: Object.values(newRoom.users),
@@ -70,6 +72,10 @@ export function useRoomActions(
         (u: any) => u[1].uid === user.uid,
       )
       if (existingUser) {
+        // Re-entry (e.g. after refresh): update name & online status
+        const userRef = ref(database, `rooms/${code}/users/${user.uid}`)
+        await update(userRef, { name: username, online: true })
+        sessionStorage.setItem(code, username)
         return
       }
 
@@ -79,6 +85,7 @@ export function useRoomActions(
         uid: user.uid,
         name: username,
         vote: '',
+        online: true,
       }
 
       await set(userRef, newUser)
@@ -208,6 +215,40 @@ export function useRoomActions(
     [room, user, database],
   )
 
+  const transferOwnership = useCallback(
+    async (newOwnerUid: string) => {
+      if (!user) {
+        throw new Error('User must be authenticated to transfer ownership')
+      }
+      if (!room) {
+        throw new Error('Room not found')
+      }
+
+      const roomRef = ref(database, `rooms/${room.code}`)
+
+      const snapshot = await get(roomRef)
+      const prevRoom = snapshot.val()
+
+      if (!prevRoom) {
+        throw new Error('Room does not exist')
+      }
+
+      if (prevRoom.ownerUid !== user.uid) {
+        throw new Error('Only the room owner can transfer ownership')
+      }
+
+      const targetUser = Object.values(prevRoom.users || {}).find(
+        (u: any) => u.uid === newOwnerUid,
+      )
+      if (!targetUser) {
+        throw new Error('Target user is not in the room')
+      }
+
+      await update(roomRef, { ownerUid: newOwnerUid })
+    },
+    [room, user, database],
+  )
+
   return {
     createRoom,
     joinRoom,
@@ -215,5 +256,6 @@ export function useRoomActions(
     vote,
     resetVotes,
     toggleRevealVotes,
+    transferOwnership,
   }
 }

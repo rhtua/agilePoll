@@ -79,10 +79,12 @@ export function RoomForm() {
       bgColor='white'
       overflowY='auto'
       gap={3}
-      borderRadius='lg'
+      borderRadius='xl'
       shadow='xl'
       px={5}
       py={8}
+      borderWidth={1}
+      borderColor='var(--color-border)'
     >
       <chakra.form
         display='flex'
@@ -154,7 +156,7 @@ export function RoomForm() {
           w='fit'
           mx='auto'
           colorPalette='orange'
-          bg='orange.500'
+          style={{ backgroundColor: 'var(--color-primary)' }}
           color='white'
           fontWeight='600'
           fontSize='md'
@@ -193,8 +195,10 @@ export function RoomForm() {
           px={7}
           colorPalette='orange'
           variant='outline'
-          borderColor='orange.500'
-          color='orange.500'
+          style={{
+            borderColor: 'var(--color-primary)',
+            color: 'var(--color-primary)',
+          }}
           fontWeight='600'
           fontSize='md'
           size='md'

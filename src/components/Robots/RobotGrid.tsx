@@ -42,9 +42,15 @@ export function CreateRobots({
           direction={isFirstRow ? 'column' : 'column-reverse'}
         >
           {robot.vote ? (
-            <FaCheckCircle color='green' />
+            <FaCheckCircle
+              color='var(--color-success)'
+              className='animate-pop'
+            />
           ) : (
-            <FaClock color='gray' />
+            <FaClock
+              color='var(--color-waiting)'
+              className='animate-pulse-soft'
+            />
           )}
           <Robot
             avatar={robot.avatar}

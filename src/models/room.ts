@@ -2,6 +2,7 @@ export interface User {
   uid: string
   name: string
   vote?: string
+  online?: boolean
 }
 
 export interface Room {

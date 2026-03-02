@@ -88,9 +88,7 @@ export default function JoinRoomComponent() {
       align='center'
       direction={'column'}
       gap={5}
-      bgImage="url('/homeBg.png')"
-      bgSize='100% 100%'
-      bgRepeat='no-repeat'
+      className='join-room-bg'
     >
       <Text fontSize='xl'>
         Voce está entrando na sala: <strong>{room?.name}</strong>{' '}
@@ -100,11 +98,13 @@ export default function JoinRoomComponent() {
         justify='center'
         align='center'
         bgColor='white'
-        shadow={'md'}
+        shadow={'lg'}
         p={5}
         gap={5}
         direction={'column'}
-        borderRadius='lg'
+        borderRadius='xl'
+        borderWidth={1}
+        borderColor='var(--color-border)'
       >
         <chakra.form
           display='flex'
@@ -132,10 +132,10 @@ export default function JoinRoomComponent() {
             size='md'
             loading={loading}
             style={{
-              borderColor: '#DD6B20',
+              borderColor: 'var(--color-primary)',
               fontWeight: 600,
               fontSize: 16,
-              color: '#DD6B20',
+              color: 'var(--color-primary)',
             }}
             type='submit'
           >

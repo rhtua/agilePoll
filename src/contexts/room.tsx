@@ -1,7 +1,7 @@
 'use client'
 import { initializeApp, type FirebaseApp } from 'firebase/app'
 import type { User } from 'firebase/auth'
-import { getDatabase, type Database } from 'firebase/database'
+import { getDatabase, onDisconnect, onValue, ref, update, type Database } from 'firebase/database'
 import { createContext, useCallback, useEffect, useMemo } from 'react'
 import { firebaseConfig } from '~/config'
 import { useRoom } from '~/hooks/useRoom'
@@ -9,7 +9,6 @@ import { useRoomActions } from '~/hooks/useRoomActions'
 import { useUser } from '~/hooks/useUser'
 import type { Room } from '~/models/room'
 
-// Lazy singleton – only initialized on the client (inside RoomProvider)
 let _app: FirebaseApp | null = null
 let _database: Database | null = null
 
@@ -36,6 +35,7 @@ export const RoomContext = createContext<{
   vote: (vote: string) => Promise<void>
   resetVotes: () => Promise<void>
   toggleRevealVotes: (show: boolean) => Promise<void>
+  transferOwnership: (newOwnerUid: string) => Promise<void>
 }>({
   user: null,
   room: null,
@@ -47,6 +47,7 @@ export const RoomContext = createContext<{
   vote: null as any,
   resetVotes: null as any,
   toggleRevealVotes: null as any,
+  transferOwnership: null as any,
 })
 
 export function RoomProvider({ children }: { children: React.ReactNode }) {
@@ -61,6 +62,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
     resetVotes,
     toggleRevealVotes,
     vote,
+    transferOwnership,
   } = useRoomActions(database, user, room, setRoom)
 
   const createRoom = useCallback(
@@ -79,17 +81,30 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
     [updateUserProfile, _joinRoom],
   )
 
-  const handleBeforeUnload = useCallback(async () => {
-    await leaveRoom()
-  }, [leaveRoom])
+  // ─── Presence via .info/connected
+  // Firebase's .info/connected fires after each new connection is established.
+  // Sequence on refresh: old onDisconnect fires → new connection → this listener
+  // sets onDisconnect then online:true, so online:true always wins.
+  const userInRoom = room?.users?.some((u) => u.uid === user?.uid) ?? false
 
   useEffect(() => {
-    window.addEventListener('beforeunload', handleBeforeUnload)
+    if (!database || !user || !room?.code || !userInRoom) return
 
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [handleBeforeUnload])
+    const userRef = ref(database, `rooms/${room.code}/users/${user.uid}`)
+    const connectedRef = ref(database, '.info/connected')
+
+    const unsub = onValue(connectedRef, (snap) => {
+      if (snap.val() !== true) return
+
+      // 1. Register onDisconnect FIRST
+      onDisconnect(userRef).update({ online: false }).then(() => {
+        // 2. THEN set online — guarantees proper ordering
+        update(userRef, { online: true })
+      })
+    })
+
+    return () => unsub()
+  }, [database, user?.uid, room?.code, userInRoom])
 
   return (
     <RoomContext.Provider
@@ -104,6 +119,7 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
         vote,
         resetVotes,
         toggleRevealVotes,
+        transferOwnership,
       }}
     >
       {children}

@@ -65,24 +65,30 @@ export default function Cards({ cards, canVote }: CardsProps) {
           borderTopRadius='lg'
           align='center'
           justify='space-between'
-          borderColor={myVote === card ? '#F7C379' : '#575757'}
+          borderColor={myVote === card ? 'var(--color-accent)' : 'var(--color-card-text)'}
           borderWidth={3}
           borderBottomWidth={myVote === card ? 3 : 0}
           borderBottomLeftRadius={myVote === card ? 'lg' : 0}
           borderBottomRightRadius={myVote === card ? 'lg' : 0}
           ml={index > 0 ? '-20px' : 0}
           direction='column'
-          color={myVote === card ? '#F7C379' : '#575757'}
+          color={myVote === card ? 'var(--color-accent)' : 'var(--color-card-text)'}
           transition='all 0.3s ease-in-out'
+          boxShadow={
+            myVote === card
+              ? '0 0 16px var(--color-accent-glow), 0 4px 12px rgba(0,0,0,0.1)'
+              : '0 2px 8px rgba(0,0,0,0.06)'
+          }
           _hover={
             canVote
               ? {
-                  color: '#F7C379',
-                  borderColor: '#F7C379',
+                  color: 'var(--color-accent)',
+                  borderColor: 'var(--color-accent)',
                   h: '180px',
                   borderBottomWidth: 3,
                   borderBottomLeftRadius: 'lg',
                   borderBottomRightRadius: 'lg',
+                  boxShadow: '0 0 16px var(--color-accent-glow), 0 4px 12px rgba(0,0,0,0.1)',
                   '& > :nth-of-type(2)': {
                     transform: 'translateY(-15px)',
                   },

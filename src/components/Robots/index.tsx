@@ -17,6 +17,11 @@ export default function Robot({ avatar, name, vote, revealVotes }: RobotProps) {
       w={'3.3rem'}
       position='relative'
       borderRadius='lg'
+      transition='transform 0.2s ease, box-shadow 0.2s ease'
+      _hover={{
+        transform: 'scale(1.08)',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+      }}
     >
       {vote && vote !== '' && revealVotes && (
         <Flex
@@ -24,8 +29,9 @@ export default function Robot({ avatar, name, vote, revealVotes }: RobotProps) {
           justify='center'
           w='full'
           h='full'
-          bgColor={'rgba(57, 57, 57, 0.9)'}
+          bgColor={'rgba(30, 41, 59, 0.88)'}
           borderRadius='lg'
+          className='animate-fade-in-scale'
         >
           <Text fontWeight={700} fontSize='3xl' color='white' zIndex={3}>
             {vote}
@@ -40,18 +46,19 @@ export default function Robot({ avatar, name, vote, revealVotes }: RobotProps) {
         bottom={0}
         left='50%'
         transform='translateX(-50%) translateY(50%)'
-        bgColor={'#FBFBFB'}
+        bgColor={'var(--color-surface)'}
         borderRadius='lg'
         align={'center'}
         justify={'center'}
-        borderColor={'#575757'}
+        borderColor={'var(--color-border-strong)'}
         borderWidth={1}
         px={1}
         py={0.5}
         fontSize='sm'
         overflow='hidden'
+        boxShadow='0 1px 4px rgba(0,0,0,0.06)'
       >
-        <Text truncate>{name}</Text>
+        <Text truncate color='var(--color-text)'>{name}</Text>
       </Flex>
     </Flex>
   )

@@ -1,5 +1,7 @@
 import {
+  browserSessionPersistence,
   getAuth,
+  setPersistence,
   signInAnonymously,
   updateProfile,
   type User,
@@ -11,9 +13,11 @@ export function useUser() {
 
   useEffect(() => {
     const auth = getAuth()
-    signInAnonymously(auth).then((user) => {
-      setUser(user.user)
-    })
+    setPersistence(auth, browserSessionPersistence).then(() =>
+      signInAnonymously(auth).then((user) => {
+        setUser(user.user)
+      }),
+    )
   }, [])
 
   useEffect(() => {

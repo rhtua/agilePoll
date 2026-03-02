@@ -10,7 +10,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cleanup": "tsx scripts/cleanup-rooms.ts"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.21.0",
@@ -29,6 +30,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "firebase-admin": "^13.7.0",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

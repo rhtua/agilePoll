@@ -32,7 +32,7 @@ export default function PollResults({ users }: CardsProps) {
   )
 
   return (
-    <Flex align='top' pb={4} gap={8}>
+    <Flex align='top' pb={4} gap={8} className='animate-slide-up'>
       <Stack align='center'>
         <Text fontWeight={600} fontSize={18}>
           Sugestão:
@@ -40,7 +40,7 @@ export default function PollResults({ users }: CardsProps) {
         <Flex
           key={card[0]}
           position={'relative'}
-          p={2}
+          py={2}
           cursor='pointer'
           w={{ base: '40px', xl: '60px' }}
           h={{ base: '60px', xl: '90px' }}
@@ -48,19 +48,40 @@ export default function PollResults({ users }: CardsProps) {
           borderRadius='lg'
           align='center'
           justify='space-between'
-          borderColor={'#F7C379'}
+          borderColor={'var(--color-accent)'}
           borderWidth={3}
           direction='column'
-          color={'#F7C379'}
+          color={'var(--color-accent)'}
           transition='all 0.3s ease-in-out'
+          boxShadow='0 0 12px var(--color-accent-glow)'
         >
-          <Text fontSize={8} fontWeight={700} w='full'>
+          <Text
+            fontSize={8}
+            fontWeight={700}
+            w='full'
+            pl={2}
+            display={{ base: 'none', xl: 'block' }}
+          >
             {card[0]}
           </Text>
-          <Text fontSize={24} textAlign='center' fontWeight={800} w='full'>
+          <Text
+            fontSize={24}
+            textAlign='center'
+            fontWeight={800}
+            w='full'
+            whiteSpace='preserve nowrap'
+            mx='auto'
+          >
             {card[0]}
           </Text>
-          <Text fontSize={8} w='full' fontWeight={700} textAlign='end'>
+          <Text
+            fontSize={8}
+            w='full'
+            fontWeight={700}
+            pr={2}
+            textAlign='end'
+            display={{ base: 'none', xl: 'block' }}
+          >
             {card[0]}
           </Text>
           <CardsIcon
@@ -88,14 +109,20 @@ export default function PollResults({ users }: CardsProps) {
             alignContent='center'
             w='full'
             h='70%'
+            color='var(--color-text)'
           >
             {avg.toFixed(1)}
           </Text>
         </Stack>
       )}
 
-      {/* Distribuição de Votos */}
-      <Stack align='flex-start' ml={{ base: 0, sm: 8 }} mt={{ base: 4, sm: 0 }} justify='center' minW='200px'>
+      <Stack
+        align='flex-start'
+        ml={{ base: 0, sm: 8 }}
+        mt={{ base: 4, sm: 0 }}
+        justify='center'
+        minW='200px'
+      >
         <Text fontWeight={600} fontSize={18} mb={2}>
           Votos:
         </Text>
@@ -109,8 +136,21 @@ export default function PollResults({ users }: CardsProps) {
                   <Text fontWeight={700} w='30px' textAlign='right'>
                     {voteStr}
                   </Text>
-                  <Flex bg='orange.100' h='12px' borderRadius='full' flex={1} maxW='150px' overflow='hidden'>
-                    <Flex bg='orange.500' h='full' borderRadius='full' w={`${widthPerc}%`} transition='width 0.5s' />
+                  <Flex
+                    bg='orange.100'
+                    h='12px'
+                    borderRadius='full'
+                    flex={1}
+                    maxW='150px'
+                    overflow='hidden'
+                  >
+                    <Flex
+                      h='full'
+                      borderRadius='full'
+                      w={`${widthPerc}%`}
+                      transition='width 0.5s'
+                      style={{ backgroundColor: 'var(--color-primary)' }}
+                    />
                   </Flex>
                   <Text fontSize={12} color='gray.600' w='50px'>
                     {count} {count === 1 ? 'voto' : 'votos'}
