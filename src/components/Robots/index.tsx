@@ -58,7 +58,9 @@ export default function Robot({ avatar, name, vote, revealVotes }: RobotProps) {
         overflow='hidden'
         boxShadow='0 1px 4px rgba(0,0,0,0.06)'
       >
-        <Text truncate color='var(--color-text)'>{name}</Text>
+        <Text truncate color='var(--color-text)'>
+          {name}
+        </Text>
       </Flex>
     </Flex>
   )

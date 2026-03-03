@@ -1,7 +1,14 @@
 'use client'
-import { initializeApp, type FirebaseApp } from 'firebase/app'
+import { type FirebaseApp, initializeApp } from 'firebase/app'
 import type { User } from 'firebase/auth'
-import { getDatabase, onDisconnect, onValue, ref, update, type Database } from 'firebase/database'
+import {
+  type Database,
+  getDatabase,
+  onDisconnect,
+  onValue,
+  ref,
+  update,
+} from 'firebase/database'
 import { createContext, useCallback, useEffect, useMemo } from 'react'
 import { firebaseConfig } from '~/config'
 import { useRoom } from '~/hooks/useRoom'
@@ -97,14 +104,16 @@ export function RoomProvider({ children }: { children: React.ReactNode }) {
       if (snap.val() !== true) return
 
       // 1. Register onDisconnect FIRST
-      onDisconnect(userRef).update({ online: false }).then(() => {
-        // 2. THEN set online — guarantees proper ordering
-        update(userRef, { online: true })
-      })
+      onDisconnect(userRef)
+        .update({ online: false })
+        .then(() => {
+          // 2. THEN set online — guarantees proper ordering
+          update(userRef, { online: true })
+        })
     })
 
     return () => unsub()
-  }, [database, user?.uid, room?.code, userInRoom])
+  }, [database, user?.uid, room?.code, userInRoom, user])
 
   return (
     <RoomContext.Provider

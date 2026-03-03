@@ -20,53 +20,84 @@ body {
 /* ── Design Tokens ── */
 :root {
   /* Primary */
-  --color-primary: #EA580C;
-  --color-primary-hover: #C2410C;
-  --color-primary-light: #FFF7ED;
-  --color-primary-100: #FFEDD5;
-  --color-primary-200: #FED7AA;
+  --color-primary: #ea580c;
+  --color-primary-hover: #c2410c;
+  --color-primary-light: #fff7ed;
+  --color-primary-100: #ffedd5;
+  --color-primary-200: #fed7aa;
 
   /* Accent / Cards */
-  --color-accent: #F59E0B;
-  --color-accent-hover: #D97706;
+  --color-accent: #f59e0b;
+  --color-accent-hover: #d97706;
   --color-accent-glow: rgba(245, 158, 11, 0.35);
 
   /* Neutrals */
-  --color-text: #1E293B;
+  --color-text: #1e293b;
   --color-text-secondary: #475569;
-  --color-text-muted: #94A3B8;
+  --color-text-muted: #94a3b8;
   --color-card-text: #334155;
-  --color-border: #E2E8F0;
-  --color-border-strong: #CBD5E1;
-  --color-surface: #FFFFFF;
-  --color-surface-dim: #F8FAFC;
-  --color-surface-dimmer: #F1F5F9;
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-surface: #ffffff;
+  --color-surface-dim: #f8fafc;
+  --color-surface-dimmer: #f1f5f9;
 
   /* Semantic */
-  --color-success: #22C55E;
-  --color-waiting: #94A3B8;
+  --color-success: #22c55e;
+  --color-waiting: #94a3b8;
 }
 
 /* ── Landing Background Pattern (CSS-only) ── */
 .landing-bg {
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(234, 88, 12, 0.06) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 50% at 80% 100%, rgba(245, 158, 11, 0.05) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 10% 60%, rgba(234, 88, 12, 0.04) 0%, transparent 70%),
-    linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-dim) 100%);
+  background: radial-gradient(
+      ellipse 80% 60% at 50% 0%,
+      rgba(234, 88, 12, 0.06) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 60% 50% at 80% 100%,
+      rgba(245, 158, 11, 0.05) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 50% 40% at 10% 60%,
+      rgba(234, 88, 12, 0.04) 0%,
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      var(--color-surface) 0%,
+      var(--color-surface-dim) 100%
+    );
 }
 
 /* ── Join Room Background Pattern ── */
 .join-room-bg {
-  background:
-    radial-gradient(ellipse 70% 50% at 50% 30%, rgba(234, 88, 12, 0.07) 0%, transparent 70%),
-    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 70%),
-    linear-gradient(180deg, var(--color-surface-dim) 0%, var(--color-surface-dimmer) 100%);
+  background: radial-gradient(
+      ellipse 70% 50% at 50% 30%,
+      rgba(234, 88, 12, 0.07) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 50% 40% at 80% 80%,
+      rgba(245, 158, 11, 0.05) 0%,
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      var(--color-surface-dim) 0%,
+      var(--color-surface-dimmer) 100%
+    );
 }
 
 /* ── Room Background ── */
 .room-bg {
-  background: linear-gradient(170deg, var(--color-surface-dim) 0%, var(--color-surface-dimmer) 50%, #EDE9FE08 100%);
+  background: linear-gradient(
+    170deg,
+    var(--color-surface-dim) 0%,
+    var(--color-surface-dimmer) 50%,
+    #ede9fe08 100%
+  );
 }
 
 /* ── Animations ── */
@@ -82,8 +113,12 @@ body {
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes fade-in-scale {
@@ -98,14 +133,29 @@ body {
 }
 
 @keyframes pulse-soft {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.25); opacity: 1; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
 }
 
 @keyframes pop {
-  0% { transform: scale(0.5); opacity: 0; }
-  60% { transform: scale(1.3); }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes slide-up {
@@ -120,8 +170,13 @@ body {
 }
 
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 12px rgba(245, 158, 11, 0.15); }
-  50% { box-shadow: 0 0 24px rgba(245, 158, 11, 0.35); }
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(245, 158, 11, 0.35);
+  }
 }
 
 @keyframes card-stagger {
@@ -161,9 +216,21 @@ body {
 }
 
 /* Stagger delay helpers */
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
-.delay-300 { animation-delay: 0.3s; }
-.delay-400 { animation-delay: 0.4s; }
-.delay-500 { animation-delay: 0.5s; }
-.delay-600 { animation-delay: 0.6s; }
+.delay-100 {
+  animation-delay: 0.1s;
+}
+.delay-200 {
+  animation-delay: 0.2s;
+}
+.delay-300 {
+  animation-delay: 0.3s;
+}
+.delay-400 {
+  animation-delay: 0.4s;
+}
+.delay-500 {
+  animation-delay: 0.5s;
+}
+.delay-600 {
+  animation-delay: 0.6s;
+}
