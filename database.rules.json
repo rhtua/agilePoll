@@ -1,6 +1,34 @@
 {
   "rules": {
-    ".read": true,
-    ".write": true
+    "rooms": {
+      "$roomId": {
+        ".read": "auth.uid != null",
+        ".write": "(!data.exists() && newData.child('ownerUid').val() == auth.uid) || (data.exists() && data.child('ownerUid').val() == auth.uid)",
+
+        "code": {
+          ".validate": "newData.isString() && (!data.exists() || newData.val() == data.val())"
+        },
+        "createdAt": { ".validate": "newData.isString()" },
+        "name": { ".validate": "newData.isString()" },
+        "ownerUid": {
+          ".validate": "newData.isString() && (!data.exists() || newData.val() == data.val() || data.val() == auth.uid)"
+        },
+        "points": { ".validate": "newData.isString()" },
+        "revealVotes": { ".validate": "newData.isBoolean()" },
+        "showPoints": { ".validate": "newData.isBoolean()" },
+
+        "users": {
+          "$userId": {
+            ".write": "auth.uid != null && ($userId == auth.uid || data.parent().parent().child('ownerUid').val() == auth.uid)",
+
+            "name": { ".validate": "newData.isString()" },
+            "uid": {
+              ".validate": "newData.isString() && (!data.exists() || newData.val() == data.val())"
+            },
+            "vote": { ".validate": "newData.isString()" }
+          }
+        }
+      }
+    }
   }
 }
